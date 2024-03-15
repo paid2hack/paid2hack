@@ -1,14 +1,12 @@
-import { PrismaAdapter } from "@auth/prisma-adapter";
+import { SiweMessage } from "siwe";
+import CredentialsProvider from "next-auth/providers/credentials";
 import {
   getServerSession,
   type DefaultSession,
   type NextAuthOptions,
 } from "next-auth";
-import { type Adapter } from "next-auth/adapters";
-import DiscordProvider from "next-auth/providers/discord";
 
 import { env } from "~/env";
-import { db } from "~/server/db";
 
 /**
  * Module augmentation for `next-auth` types. Allows us to add custom properties to the `session`
@@ -31,6 +29,45 @@ declare module "next-auth" {
   // }
 }
 
+const providers = [
+  CredentialsProvider({
+    name: "Ethereum",
+    credentials: {
+      message: {
+        label: "Message",
+        type: "text",
+        placeholder: "0x0",
+      },
+      signature: {
+        label: "Signature",
+        type: "text",
+        placeholder: "0x0",
+      },
+    },
+    async authorize(credentials) {
+      try {
+        const siwe = new SiweMessage(JSON.parse(credentials?.message || "{}"));
+        const nextAuthUrl = new URL(env.NEXTAUTH_URL);
+
+        const result = await siwe.verify({
+          signature: credentials?.signature || "",
+          domain: nextAuthUrl.host,
+          nonce: (credentials as any)?.csrfToken || "",
+        });
+
+        if (result.success) {
+          return {
+            id: siwe.address,
+          };
+        }
+        return null;
+      } catch (e) {
+        return null;
+      }
+    },
+  }),
+];
+
 /**
  * Options for NextAuth.js used to configure adapters, providers, callbacks, etc.
  *
@@ -42,26 +79,10 @@ export const authOptions: NextAuthOptions = {
       ...session,
       user: {
         ...session.user,
-        id: user.id,
       },
     }),
   },
-  adapter: PrismaAdapter(db) as Adapter,
-  providers: [
-    DiscordProvider({
-      clientId: env.DISCORD_CLIENT_ID,
-      clientSecret: env.DISCORD_CLIENT_SECRET,
-    }),
-    /**
-     * ...add more providers here.
-     *
-     * Most other providers require a bit more work than the Discord provider. For example, the
-     * GitHub provider requires you to add the `refresh_token_expires_in` field to the Account
-     * model. Refer to the NextAuth.js docs for the provider you want to use. Example:
-     *
-     * @see https://next-auth.js.org/providers/github
-     */
-  ],
+  providers,
 };
 
 /**
