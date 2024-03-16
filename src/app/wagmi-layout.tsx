@@ -27,7 +27,7 @@ const metadata = {
   icons: [{ rel: "icon", url: "/favicon.ico" }],
 };
 
-import { Disclaimer } from '~/ui/connectWallet'
+import { ConnectWallet, Disclaimer } from '~/ui/connectWallet'
 
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 
@@ -64,7 +64,12 @@ export const WagmiLayout: FC<PropsWithChildren<{}>> = ({ children }) => {
               }}
             >
               <main className="relative min-h-screen bg-gradient-to-b from-[#2e026d] to-[#15162c] text-white">
-                {children}
+                <div className="absolute right-2 top-2">
+                  <ConnectWallet />
+                </div>
+                <div className="relative top-10 p-4">
+                  {children}
+                </div>
               </main>
             </RainbowKitProvider>
           </RainbowKitSiweNextAuthProvider>

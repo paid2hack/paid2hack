@@ -1,6 +1,8 @@
 import { createEnv } from "@t3-oss/env-nextjs";
 import { z } from "zod";
 
+const isEthereumAddress = (/** @type {string} */ str) => !!str.match(/^0x[0-9a-fA-F]{40}$/)
+
 export const env = createEnv({
   /**
    * Specify your server-side environment variables schema here. This way you can ensure the app
@@ -36,6 +38,9 @@ export const env = createEnv({
    * `NEXT_PUBLIC_`.
    */
   client: {
+    NEXT_PUBLIC_MASTER_CONTRACT: z
+      .string()
+      .refine(isEthereumAddress, "Must be a valid Ethereum address"),
     NEXT_PUBLIC_CHAIN: z.enum(["localhost"]),
     NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID: z.string(),
     NEXT_PUBLIC_CHAIN_RPC_ENDPOINT: z.string().url(),
@@ -46,6 +51,7 @@ export const env = createEnv({
    * middlewares) or client-side so we need to destruct manually.
    */
   runtimeEnv: {
+    NEXT_PUBLIC_MASTER_CONTRACT: process.env.NEXT_PUBLIC_MASTER_CONTRACT,
     NEXT_PUBLIC_CHAIN: process.env.NEXT_PUBLIC_CHAIN,
     NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID:
       process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID,

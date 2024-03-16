@@ -1,12 +1,8 @@
 import Link from "next/link";
-import { ConnectWallet } from "~/ui/connectWallet";
 
 export default function HomePage() {
   return (
     <div className="flex flex-col items-center justify-center">
-      <div className="absolute right-2 top-2">
-        <ConnectWallet />
-      </div>
       <div className="container flex flex-col items-center justify-center gap-12 px-4 py-16 ">
         <h1 className="text-5xl font-extrabold tracking-tight text-white sm:text-[5rem]">
           &lt; Paid<span className="text-[hsl(280,100%,70%)]">2</span>Hack &#47;
