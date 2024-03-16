@@ -25,7 +25,7 @@ Contracts repo: https://github.com/paid2hack/contracts
 AGPLv3 - see [LICENSE.md](LICENSE.md)
 
 Paid2Hack app
-Copyright (C) 2024  [Paid2Hack](https://paid2.hack)
+Copyright (C) 2024  [Paid2Hack](https://github.com/paid2hack)
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU Affero General Public License as
