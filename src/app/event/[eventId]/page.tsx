@@ -8,6 +8,13 @@ import { LoadEventInfo } from '~/app/Components/UI/LoadEventInfo';
 import { TeamList } from '~/app/Components/UI/TeamList';
 import { UpdateEventNameDialog } from '~/app/Components/Dialogs/UpdateEventNameDialog';
 import { Card, CardHeader, CardTitle } from '~/app/Components/UI/card';
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from '~/app/Components/UI/tabs';
+import { Separator } from '~/app/Components/UI/separator';
 
 export default function EventPage({ params }: { params: { eventId: number } }) {
   const { eventId } = params;
@@ -16,33 +23,58 @@ export default function EventPage({ params }: { params: { eventId: number } }) {
     <LoadEventInfo eventId={eventId}>
       {(ev, isEventCreator) => (
         <div>
-          <h1>
-            Event: {ev.name} (id: {eventId})
-          </h1>
-          <p className="my-2">Creator: {ev.owner}</p>
-          {isEventCreator && (
-            <UpdateEventNameDialog eventId={eventId}>
-              <Button className="mb-2">Update event name</Button>
-            </UpdateEventNameDialog>
-          )}
-          <div className="mt-10">
-            <h2>Teams</h2>
-            <IfWalletConnected connectButton={null}>
-              <CreateTeamDialog eventId={eventId}>
-                <Button className="mb-4">Create team</Button>
-              </CreateTeamDialog>
-              <TeamList eventId={eventId} />
-            </IfWalletConnected>
+          <div className="my-6 flex flex-col rounded-md border-4   p-6">
+            <div className="w-full space-y-1">
+              <h4 className="text-sm font-medium leading-none">
+                <h1>Event: {ev.name}</h1>
+              </h4>
+              <p className="text-sm text-muted-foreground">
+                id: {eventId}
+                <div>Creator: {ev.owner} </div>
+              </p>
+            </div>
+            <Separator className="my-4" />
+            <div className="mt-2 flex h-5 items-center space-x-4 text-sm">
+              <Separator orientation="vertical" />
+              <Button variant="ghost">Site</Button>
+              <Separator orientation="vertical" />
+              <div>
+                {isEventCreator && (
+                  <UpdateEventNameDialog eventId={eventId}>
+                    <Button>Update event name</Button>
+                  </UpdateEventNameDialog>
+                )}
+              </div>
+            </div>
           </div>
-          <div className="mt-10">
-            <h2>Sponsors</h2>
-            <IfWalletConnected connectButton={null}>
-              <CreateSponsorDialog eventId={eventId}>
-                <Button className="mb-4">Become a sponsor</Button>
-              </CreateSponsorDialog>
-              <SponsorList eventId={eventId} />
-            </IfWalletConnected>
-          </div>
+
+          <Tabs defaultValue="funding" className="w-full  border-4">
+            <TabsList className="w-full">
+              <TabsTrigger className="basis-1/2" value="funding">
+                Funding
+              </TabsTrigger>
+              <TabsTrigger className="basis-1/2" value="teams">
+                Teams
+              </TabsTrigger>
+            </TabsList>
+            <TabsContent value="funding" className="border-4"></TabsContent>
+            <TabsContent value="teams">
+              <IfWalletConnected connectButton={null}>
+                <CreateTeamDialog eventId={eventId}>
+                  <Button className="mb-4">Create team</Button>
+                </CreateTeamDialog>
+                <div>
+                  <h2>Teams</h2>
+                  <Separator />
+                  <div className="my-4">
+                    <TeamList eventId={eventId} />
+                  </div>
+                </div>
+              </IfWalletConnected>
+            </TabsContent>
+          </Tabs>
+
+          <div className="mt-10"></div>
         </div>
       )}
     </LoadEventInfo>

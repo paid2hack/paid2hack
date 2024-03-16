@@ -17,7 +17,7 @@ export default function RootLayout({
     <html lang="en">
       <body className={`font-sans ${inter.variable}`}>
         <WagmiLayout>
-          <div className="mx-auto max-w-screen-lg">{children}</div>
+          <div className="">{children}</div>
         </WagmiLayout>
       </body>
     </html>

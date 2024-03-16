@@ -13,11 +13,11 @@ import { useWriteContract } from 'wagmi';
 import { MASTER_CONTRACT_CONFIG } from '~/contracts';
 import { Button } from '../UI/Button';
 import { ErrorBox } from '../UI/ErrorBox';
-import { EventInfo, LoadEventInfo } from '../UI/LoadEventInfo';
+import { LoadTeamInfo, TeamInfo } from '../UI/LoadTeamInfo';
 
 const Form: FC<{
   id: number;
-  info: EventInfo;
+  info: TeamInfo;
   closeDialog: CloseDialogCallback;
 }> = ({ id, info, closeDialog }) => {
   const { writeContractAsync } = useWriteContract();
@@ -50,7 +50,7 @@ const Form: FC<{
 
         await writeContractAsync({
           ...MASTER_CONTRACT_CONFIG,
-          functionName: 'updateEventName',
+          functionName: 'updateTeamName',
           args: [BigInt(id), name],
         });
 
@@ -76,27 +76,23 @@ const Form: FC<{
         max={40}
         size={30}
       />
-
-      <button type="submit" disabled={!canSubmit} className="relative p-[3px]">
-        <div className="absolute inset-0 rounded-lg bg-gradient-to-r from-indigo-500 to-purple-500" />
-        <div className="group relative  rounded-[6px] bg-black  px-8 py-2 text-white transition duration-200 hover:bg-transparent">
-          Update Event Name
-        </div>
-      </button>
+      <Button className="mb-2" type="submit" disabled={!canSubmit}>
+        Update team name
+      </Button>
       {error ? <ErrorBox>{error}</ErrorBox> : null}
     </form>
   );
 };
 
-export const UpdateEventNameDialog: FC<
-  PropsWithChildren<{ eventId: number }>
-> = ({ eventId, children }) => {
+export const UpdateTeamNameDialog: FC<
+  PropsWithChildren<{ teamId: number }>
+> = ({ teamId, children }) => {
   return (
     <ActionDialog
       renderContent={(closeDialog) => (
-        <LoadEventInfo eventId={eventId}>
-          {(ev) => <Form id={eventId} info={ev} closeDialog={closeDialog} />}
-        </LoadEventInfo>
+        <LoadTeamInfo teamId={teamId}>
+          {(team) => <Form id={teamId} info={team} closeDialog={closeDialog} />}
+        </LoadTeamInfo>
       )}
     >
       {children}
