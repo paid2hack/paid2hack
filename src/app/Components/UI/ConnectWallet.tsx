@@ -1,8 +1,10 @@
+
 'use client'
 
 import { ConnectButton, DisclaimerComponent } from '@rainbow-me/rainbowkit'
-import { PropsWithClassName } from './utils';
+import { PropsWithClassName } from '~/app/lib/utils';
 import { FC } from 'react';
+import { Button } from './Button';
 
 export const Disclaimer: DisclaimerComponent = ({ Text, Link }) => (
   <Text>
@@ -49,22 +51,22 @@ export const ConnectWallet: FC<PropsWithClassName> = ({ className }) => {
             {(() => {
               if (!connected) {
                 return (
-                  <button onClick={openConnectModal}>
+                  <Button onClick={openConnectModal}>
                     Connect Wallet
-                  </button>
+                  </Button>
                 );
               }
               if (chain.unsupported) {
                 return (
-                  <button onClick={openChainModal}>
+                  <Button onClick={openChainModal}>
                     Wrong network
-                  </button>
+                  </Button>
                 );
               }
               return (
-                <button onClick={openAccountModal}>
+                <Button onClick={openAccountModal}>
                   {account.displayName}
-                </button>
+                </Button>
               );
             })()}
           </div>

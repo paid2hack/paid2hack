@@ -27,7 +27,7 @@ const metadata = {
   icons: [{ rel: "icon", url: "/favicon.ico" }],
 };
 
-import { ConnectWallet, Disclaimer } from '~/ui/connectWallet'
+import { ConnectWallet, Disclaimer } from '~/app/Components/UI/ConnectWallet'
 
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import Link from 'next/link'
