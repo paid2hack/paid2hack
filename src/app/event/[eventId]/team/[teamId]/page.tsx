@@ -20,12 +20,15 @@ const TeamInfo = ({ event, teamId, teamInfo }: { event: EventInfo, teamId: numbe
     <div>
       <h1>Team: {teamInfo.name}</h1>
       <p>Leader: {teamInfo.leader}</p>
-      <p>Members: {teamInfo.members.join(", ")}</p>
       <IfTeamLeader teamId={teamId}>
         <UpdateTeamNameDialog teamId={teamId}>
           <Button className="mb-2">Update team name</Button>
         </UpdateTeamNameDialog>
       </IfTeamLeader>
+      <h2>Members:</h2>
+      <ul>
+        {teamInfo.members.map((member, i) => <li key={i}>{member}</li>)}
+      </ul>
     </div>
   )
 }

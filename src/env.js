@@ -41,6 +41,9 @@ export const env = createEnv({
     NEXT_PUBLIC_MASTER_CONTRACT: z
       .string()
       .refine(isEthereumAddress, "Must be a valid Ethereum address"),
+    NEXT_PUBLIC_PAYMENT_TOKEN_CONTRACT: z
+      .string()
+      .refine(isEthereumAddress, "Must be a valid Ethereum address"),
     NEXT_PUBLIC_CHAIN: z.enum(["localhost"]),
     NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID: z.string(),
     NEXT_PUBLIC_CHAIN_RPC_ENDPOINT: z.string().url(),
@@ -52,6 +55,8 @@ export const env = createEnv({
    */
   runtimeEnv: {
     NEXT_PUBLIC_MASTER_CONTRACT: process.env.NEXT_PUBLIC_MASTER_CONTRACT,
+    NEXT_PUBLIC_PAYMENT_TOKEN_CONTRACT:
+      process.env.NEXT_PUBLIC_PAYMENT_TOKEN_CONTRACT,
     NEXT_PUBLIC_CHAIN: process.env.NEXT_PUBLIC_CHAIN,
     NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID:
       process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID,

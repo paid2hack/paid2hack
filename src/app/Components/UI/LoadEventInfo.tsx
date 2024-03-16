@@ -9,6 +9,7 @@ export interface EventInfo {
   name: string
   owner: `0x${string}`
   teamIds: readonly bigint[]
+  sponsors: readonly string[]
 }
 
 /**

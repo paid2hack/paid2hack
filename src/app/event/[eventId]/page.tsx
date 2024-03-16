@@ -1,10 +1,12 @@
 "use client"
 
 import { Button } from "~/app/Components/UI/Button"
+import { CreateSponsorDialog } from "~/app/Components/UI/CreateSponsorDialog"
 import { CreateTeamDialog } from "~/app/Components/UI/CreateTeamDialog"
 import { IfEventCreator } from "~/app/Components/UI/IfEventCreator"
 import { IfWalletConnected } from "~/app/Components/UI/IfWalletConnected"
 import { LoadEventInfo } from "~/app/Components/UI/LoadEventInfo"
+import { SponsorList } from "~/app/Components/UI/SponsorList"
 import { TeamList } from "~/app/Components/UI/TeamList"
 import { UpdateEventNameDialog } from "~/app/Components/UI/UpdateEventNameDialog"
 
@@ -29,6 +31,15 @@ export default function EventPage({ params }: { params: { eventId: string } }) {
                 <Button className="mb-4">Create team</Button>
               </CreateTeamDialog>
               <TeamList eventId={eventId} />
+            </IfWalletConnected>
+          </div>
+          <div className="mt-10">
+            <h2>Sponsors</h2>
+            <IfWalletConnected connectButton={null}>
+              <CreateSponsorDialog eventId={eventId}>
+                <Button className="mb-4">Become a sponsor</Button>
+              </CreateSponsorDialog>
+              <SponsorList eventId={eventId} />
             </IfWalletConnected>
           </div>
         </div>
