@@ -8,8 +8,8 @@ import { LoadEventInfo } from "~/app/Components/UI/LoadEventInfo"
 import { TeamList } from "~/app/Components/UI/TeamList"
 import { UpdateEventNameDialog } from "~/app/Components/UI/UpdateEventNameDialog"
 
-export default function EventPage({ params }: { params: { eventId: number } }) {
-  const { eventId } = params
+export default function EventPage({ params }: { params: { eventId: string } }) {
+  const eventId = Number(params.eventId)
 
   return (
     <LoadEventInfo eventId={eventId}>

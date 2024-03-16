@@ -30,8 +30,9 @@ const TeamInfo = ({ event, teamId, teamInfo }: { event: EventInfo, teamId: numbe
   )
 }
 
-export default function TeamPate({ params }: { params: { eventId: number, teamId: number } }) {
-  const { eventId, teamId } = params
+export default function TeamPage({ params }: { params: { eventId: string, teamId: string } }) {
+  const eventId = Number(params.eventId)
+  const teamId = Number(params.teamId)
 
   return (
     <LoadEventInfo eventId={eventId}>
