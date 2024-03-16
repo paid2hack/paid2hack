@@ -30,6 +30,7 @@ const metadata = {
 import { ConnectWallet, Disclaimer } from '~/ui/connectWallet'
 
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import Link from 'next/link'
 
 const getSiweMessageOptions: GetSiweMessageOptions = () => ({
   statement: `Sign in to ${metadata.title}`,
@@ -64,6 +65,9 @@ export const WagmiLayout: FC<PropsWithChildren<{}>> = ({ children }) => {
               }}
             >
               <main className="relative min-h-screen bg-gradient-to-b from-[#2e026d] to-[#15162c] text-white">
+                <div className="absolute left-2 top-2">
+                  <Link href="/">Home</Link>
+                </div>
                 <div className="absolute right-2 top-2">
                   <ConnectWallet />
                 </div>

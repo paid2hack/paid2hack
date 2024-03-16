@@ -2,8 +2,8 @@
 
 import { useCallback, useMemo, useState } from "react";
 import { usePublicClient, useWriteContract } from 'wagmi'
-import { MasterABi } from "~/contracts/abi";
-import { env } from "~/env";
+import { MASTER_CONTRACT_CONFIG } from "~/contracts";
+import { ErrorBox } from "../Components/UI/ErrorBox";
 
 export default function OrganizersPage() {
   const { writeContractAsync } = useWriteContract()
@@ -32,8 +32,7 @@ export default function OrganizersPage() {
       setCreating(true)
 
       const hash = await writeContractAsync({
-        abi: MasterABi,
-        address: env.NEXT_PUBLIC_MASTER_CONTRACT as `0x${string}`,
+        ...MASTER_CONTRACT_CONFIG,
         functionName: 'createEvent',
         args: [name],
       })
@@ -55,7 +54,7 @@ export default function OrganizersPage() {
       <form onSubmit={onSubmit}>
         <input className="text-black" type="text" placeholder="Event name" onChange={onNameChange} value={name} max={40} size={30} />
         <button type="submit" disabled={!canSubmit}>Create event</button>
-        {error ? <div className="bg-red text-white">{error}</div> : null}
+        {error ? <ErrorBox>{error}</ErrorBox> : null}
       </form>
     </div>
   )
