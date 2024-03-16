@@ -5,6 +5,7 @@ import { CreateTeamDialog } from "~/app/Components/UI/CreateTeamDialog"
 import { IfEventCreator } from "~/app/Components/UI/IfEventCreator"
 import { IfWalletConnected } from "~/app/Components/UI/IfWalletConnected"
 import { LoadEventInfo } from "~/app/Components/UI/LoadEventInfo"
+import { TeamList } from "~/app/Components/UI/TeamList"
 import { UpdateEventNameDialog } from "~/app/Components/UI/UpdateEventNameDialog"
 
 export default function EventPage({ params }: { params: { id: number } }) {
@@ -22,10 +23,12 @@ export default function EventPage({ params }: { params: { id: number } }) {
             </UpdateEventNameDialog>
           </IfEventCreator>
           <div className="mt-10">
+            <h2>Teams</h2>
             <IfWalletConnected connectButton={null}>
               <CreateTeamDialog eventId={id}>
-                <Button>Create team</Button>
+                <Button className="mb-4">Create team</Button>
               </CreateTeamDialog>
+              <TeamList eventId={id} />
             </IfWalletConnected>
           </div>
         </div>

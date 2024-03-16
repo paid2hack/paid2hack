@@ -11,15 +11,16 @@ import { useEvents, useTotalEvents } from "~/app/hooks/event";
 
 const PER_PAGE = 10
 
-const List: FC<{ totalEvents: number, events: any }> = ({ totalEvents, events }) => {
+const List: FC<{ total: number, events: any }> = ({ total, events }) => {
   const items = useMemo(() => {
     const { pages = [] } = events
+    console.log(events)
 
     let tokenId = 1
     let ret: ReactNode[] = []
 
-    for (let i = 0; i < pages.length && ret.length < totalEvents; i++) {
-      for (let j = 0; j < pages[i].length && ret.length < totalEvents; j++) {
+    for (let i = 0; i < pages.length && ret.length < total; i++) {
+      for (let j = 0; j < pages[i].length && ret.length < total; j++) {
         if (pages[i][j].error) {
           ret.push(<li key={tokenId++}><ErrorBox>{pages[i][j].error}</ErrorBox></li>)
         } else {
@@ -36,25 +37,33 @@ const List: FC<{ totalEvents: number, events: any }> = ({ totalEvents, events })
     }
 
     return ret
-  }, [events, totalEvents])
+  }, [events, total])
 
   return <ul className="flex flex-col justify-start items-start">{items}</ul>
 }
 
 export const EventList: FC = () => {
-  const totalEventsRaw = useTotalEvents()
+  const totalRaw = useTotalEvents()
 
-  const totalEvents = useMemo(() => {
-    return Number(totalEventsRaw.data || 0)
-  }, [totalEventsRaw.data])
+  const total = useMemo(() => {
+    return Number(totalRaw.data || 0)
+  }, [totalRaw.data])
 
   const events = useEvents(PER_PAGE)
 
+  const isLoading = useMemo(() => {
+    return events.isLoading || totalRaw.isLoading
+  }, [events.isLoading, totalRaw.isLoading])
+
+  const error = useMemo(() => {
+    return events.error || totalRaw.error
+  }, [events.error, totalRaw.error])
+
   return (
     <div>
-      {events.error && <ErrorBox>Error loading events: {`${events.error}`}</ErrorBox>}
-      {events.isLoading && <Loading />}
-      {events.data && <List totalEvents={totalEvents} events={events.data} />}
+      {error && <ErrorBox>Error loading events: {`${error}`}</ErrorBox>}
+      {isLoading && <Loading />}
+      {events.data && <List total={total} events={events.data} />}
     </div>
   )
 }

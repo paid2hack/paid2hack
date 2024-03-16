@@ -56,6 +56,45 @@ export const MasterABi = [
   },
   {
     type: "function",
+    name: "getEventTeam",
+    inputs: [
+      { name: "_eventId", type: "uint256", internalType: "uint256" },
+      { name: "_teamIndex", type: "uint256", internalType: "uint256" },
+    ],
+    outputs: [
+      {
+        name: "",
+        type: "tuple",
+        internalType: "struct Team",
+        components: [
+          { name: "name", type: "string", internalType: "string" },
+          { name: "leader", type: "address", internalType: "address" },
+          { name: "members", type: "address[]", internalType: "address[]" },
+        ],
+      },
+    ],
+    stateMutability: "view",
+  },
+  {
+    type: "function",
+    name: "getTeam",
+    inputs: [{ name: "_teamId", type: "uint256", internalType: "uint256" }],
+    outputs: [
+      {
+        name: "",
+        type: "tuple",
+        internalType: "struct Team",
+        components: [
+          { name: "name", type: "string", internalType: "string" },
+          { name: "leader", type: "address", internalType: "address" },
+          { name: "members", type: "address[]", internalType: "address[]" },
+        ],
+      },
+    ],
+    stateMutability: "view",
+  },
+  {
+    type: "function",
     name: "name",
     inputs: [],
     outputs: [{ name: "", type: "string", internalType: "string" }],
