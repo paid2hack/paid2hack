@@ -7,6 +7,7 @@ import { Button } from "~/app/Components/UI/Button"
 import { ErrorBox } from "~/app/Components/UI/ErrorBox"
 import { IfSponsorOwner } from "~/app/Components/UI/IfSponsorOwner"
 import { EventInfo, LoadEventInfo } from "~/app/Components/UI/LoadEventInfo"
+import { LoadTeamInfo } from "~/app/Components/UI/LoadTeamInfo"
 import { Loading } from "~/app/Components/UI/Loading"
 import { UpdateSponsorNameDialog } from "~/app/Components/UI/UpdateSponsorNameDialog"
 import { useSponsor, useSponsorPrizes } from "~/app/hooks/sponsor"
@@ -26,20 +27,22 @@ const SponsorInfo = ({ event, sponsorAddress }: { event: EventInfo, sponsorAddre
     const ret: ReactNode[] = []
     let itemIndex = 1
 
-    if (prizes.data) {
+    if (prizes.parsedData) {
       for (let i = 0; i < event.teamIds.length; i++) {
-        if (prizes.data[i]?.error) {
-          ret.push(<li key={itemIndex++}>
-            <ErrorBox>{`${prizes.data[i]!.error}`}</ErrorBox>
-          </li>)
-        } else if (prizes.data[i]?.result) {
-          ret.push(<li key={itemIndex++}>{formatEther(BigInt(prizes.data[i]!.result!))}</li>)
-        }
+        ret.push(
+          <li key={itemIndex++}>
+            <LoadTeamInfo teamId={prizes.parsedData[i]!.teamId}>
+              {(team) => (
+                <p>{team.name} - {formatEther(prizes.parsedData![i]!.prize)}</p>
+              )}
+            </LoadTeamInfo>
+          </li>
+          )
       }
     }
 
     return ret
-  }, [event.teamIds.length, prizes.data])
+  }, [event.teamIds.length, prizes.parsedData])
 
   if (isLoading) {
     return <Loading />

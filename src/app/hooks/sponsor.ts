@@ -10,6 +10,12 @@ export interface SponsorInfo {
   owner: string
 }
 
+export interface TeamPrizeInfo {
+  teamId: number
+  token: string
+  prize: bigint
+}
+
 const _parseSponsorInfoFromResultArray = (address: string, data: any[]) => {
   return {
     address,
@@ -67,21 +73,57 @@ export const useSponsor = (sponsorAddress: string) => {
 export const useSponsorPrizes = (sponsorAddress: string, teamIds: bigint[]) => {
   const address = sponsorAddress as `0x${string}`;
 
-  return useReadContracts({
-    contracts: teamIds
-      .map((id) => [
-        {
-          ...SPONSOR_CONTRACT_CONFIG,
-          address,
-          functionName: "teamPrizes",
-          args: [id],
-        },
-      ])
-      .flat(),
+  const raw = useReadContracts({
+    contracts: teamIds.map((id) => [
+      {
+        ...SPONSOR_CONTRACT_CONFIG,
+        address,
+        functionName: "getPrizeAmount",
+        args: [id, env.NEXT_PUBLIC_PAYMENT_TOKEN_CONTRACT],
+      },
+    ]).flat(),
     query: {
       ...DEFAULT_CONTRACT_QUERY_OPTIONS,
     },
   });
+
+  const noErrors = useMemo(() => {
+    if (
+      raw.isLoading ||
+      raw.error ||
+      !raw.data ||
+      raw.data.length !== teamIds.length
+    ) {
+      return false;
+    }
+
+    return raw.data.reduce((m, v) => {
+      return m && !v.error;
+    }, true);
+  }, [raw.data, raw.error, raw.isLoading, teamIds.length]);
+
+  const parsedData = useMemo(() => {
+    if (!noErrors) {
+      return null;
+    }
+
+    const ret: TeamPrizeInfo[] = [];
+
+    for (let i = 0; i < teamIds.length; i++) {
+      ret.push({
+        teamId: Number(teamIds[i]),
+        token: env.NEXT_PUBLIC_PAYMENT_TOKEN_CONTRACT,
+        prize: BigInt(raw.data![i]!.result!),
+      })  
+    }
+
+    return ret;
+  }, [noErrors, raw.data, teamIds]);
+
+  return {
+    ...raw,
+    parsedData,
+  }
 };
 
 export const useSponsors = (sponsorAddresses: string[]) => {
