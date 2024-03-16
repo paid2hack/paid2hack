@@ -83,7 +83,7 @@ export const useEventTeams = (eventId: number, perPage: number) => {
         const [teamId, team] = pages[i][j].result;
 
         if (team.leader !== zeroAddress) {
-          ret.push({ teamId, info: team as TeamInfo })
+          ret.push({ teamId: Number(teamId), info: team as TeamInfo })
         }
       }
     }

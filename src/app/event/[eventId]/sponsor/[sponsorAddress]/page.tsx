@@ -3,41 +3,30 @@
 import Link from "next/link"
 import { ReactNode, useCallback, useEffect, useMemo, useState } from "react"
 import { formatEther } from "viem"
-import { useWriteContract } from "wagmi"
 import { Button } from "~/app/Components/UI/Button"
 import { ErrorBox } from "~/app/Components/UI/ErrorBox"
 import { EventInfo, LoadEventInfo } from "~/app/Components/UI/LoadEventInfo"
 import { LoadSponsorInfo } from "~/app/Components/UI/LoadSponsorInfo"
 import { LoadTeamInfo } from "~/app/Components/UI/LoadTeamInfo"
 import { Loading } from "~/app/Components/UI/Loading"
+import { TeamSelector } from "~/app/Components/UI/TeamSelector"
 import { UpdateSponsorNameDialog } from "~/app/Components/UI/UpdateSponsorNameDialog"
 import { SponsorInfo, useSponsor, useSponsorPrizes } from "~/app/hooks/sponsor"
-import { useEventTeams } from "~/app/hooks/team"
-import { isEthereumAddress, isSameEthereumAddress } from "~/app/lib/utils"
-import { MASTER_CONTRACT_CONFIG } from "~/contracts"
+import { isSameEthereumAddress } from "~/app/lib/utils"
 
 interface Params { eventId: number, event: EventInfo, sponsorAddress: string, sponsor: SponsorInfo, isSponsorOwner: boolean }
 
 const AllocateForm = (params: Params) => {
-  const { eventId, event } = params
-  
-  const { writeContractAsync } = useWriteContract()
-
-  const teams = useEventTeams(eventId, 20)
-
   const [team, setTeam] = useState<number>()
   const [updating, setUpdating] = useState(false)
   const [error, setError] = useState()
 
-  // load all teams
-  useEffect(() => {
-    if (teams.parsedData && teams.parsedData.length < event.teamIds.length && !teams.isFetching) {
-      teams.fetchNextPage()
-    }
-  }, [event.teamIds.length, teams])
+  const onTeamSelect = useCallback((teamId: number) => {
+    setTeam(teamId)
+  }, [])
 
   const canSubmit = useMemo(() => {
-    return !updating && !!team
+    return !updating && team
   }, [team, updating])
 
   const onSubmit = useCallback(async (e: React.FormEvent<HTMLFormElement>) => {
@@ -54,31 +43,13 @@ const AllocateForm = (params: Params) => {
     }
   }, [])
 
-  const onSelectTeam = useCallback((e: React.ChangeEvent<HTMLSelectElement>) => {
-    console.log(e)
-    setTeam(Number(e.target.value))
-  }, [])
-
-  if (teams.isLoading || !teams.parsedData) {
-    return <Loading />
-  }
-
-  if (teams.error) {
-    return <ErrorBox>{`${teams.error}`}</ErrorBox>
-  }
-
   return (
     <form className="mt-6" onSubmit={onSubmit}>
       <h2>Allocate prize:</h2>
       <div>
-        <label className="bold">Team:</label>
-        <select onChange={onSelectTeam} value={team}>
-          {teams.parsedData!.map((idAndInfo, i) => (
-            <option key={i} value={idAndInfo.teamId}>{idAndInfo.info.name}</option>
-          ))}
-        </select>
+        <TeamSelector {...params} onSelect={onTeamSelect} />
       </div>
-      <Button className="mb-2" type="submit" disabled={!canSubmit}>Add new member</Button>
+      <Button className="mb-2" type="submit" disabled={!canSubmit}>Submit</Button>
       {error ? <ErrorBox>{error}</ErrorBox> : null}
     </form>
   )
@@ -105,7 +76,7 @@ const SponsorInfo = (params: Params) => {
           <li key={itemIndex++}>
             <LoadTeamInfo teamId={prizes.parsedData[i]!.teamId}>
               {(team) => (
-                <p>{team.name} - {formatEther(prizes.parsedData![i]!.prize)}</p>
+              <p>{team.name} - {formatEther(prizes.parsedData![i]!.prize)} tokens</p>
               )}
             </LoadTeamInfo>
           </li>
