@@ -1,13 +1,13 @@
-"use client";
-import { useScroll, useTransform } from "framer-motion";
-import React, { Suspense } from "react";
-import { EscrowAnimation } from "../Components/UI/EscrowAnimation";
+'use client';
+import { useScroll, useTransform } from 'framer-motion';
+import React, { Suspense } from 'react';
+import { EscrowAnimation } from '../Components/UI/EscrowAnimation';
 
 export function Header() {
   const ref = React.useRef(null);
   const { scrollYProgress } = useScroll({
     target: ref,
-    offset: ["start start", "end start"],
+    offset: ['start start', 'end start'],
   });
 
   const pathLengthFirst = useTransform(scrollYProgress, [0, 0.8], [0.2, 1.2]);

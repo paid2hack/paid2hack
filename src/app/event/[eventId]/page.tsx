@@ -1,22 +1,24 @@
-"use client"
+'use client';
 
-import { Button } from "~/app/Components/UI/Button"
-import { CreateSponsorDialog } from "~/app/Components/UI/CreateSponsorDialog"
-import { CreateTeamDialog } from "~/app/Components/UI/CreateTeamDialog"
-import { IfWalletConnected } from "~/app/Components/UI/IfWalletConnected"
-import { LoadEventInfo } from "~/app/Components/UI/LoadEventInfo"
-import { SponsorList } from "~/app/Components/UI/SponsorList"
-import { TeamList } from "~/app/Components/UI/TeamList"
-import { UpdateEventNameDialog } from "~/app/Components/UI/UpdateEventNameDialog"
+import { Button } from '~/app/Components/UI/Button';
+import { CreateTeamDialog } from '~/app/Components/Dialogs/CreateTeamDialog';
 
-export default function EventPage({ params }: { params: { eventId: string } }) {
-  const eventId = Number(params.eventId)
+import { IfWalletConnected } from '~/app/Components/UI/IfWalletConnected';
+import { LoadEventInfo } from '~/app/Components/UI/LoadEventInfo';
+import { TeamList } from '~/app/Components/UI/TeamList';
+import { UpdateEventNameDialog } from '~/app/Components/Dialogs/UpdateEventNameDialog';
+import { Card, CardHeader, CardTitle } from '~/app/Components/UI/card';
+
+export default function EventPage({ params }: { params: { eventId: number } }) {
+  const { eventId } = params;
 
   return (
     <LoadEventInfo eventId={eventId}>
       {(ev, isEventCreator) => (
         <div>
-          <h1>Event: {ev.name} (id: {eventId})</h1>
+          <h1>
+            Event: {ev.name} (id: {eventId})
+          </h1>
           <p className="my-2">Creator: {ev.owner}</p>
           {isEventCreator && (
             <UpdateEventNameDialog eventId={eventId}>
@@ -44,5 +46,5 @@ export default function EventPage({ params }: { params: { eventId: string } }) {
         </div>
       )}
     </LoadEventInfo>
-  )
+  );
 }

@@ -1,36 +1,36 @@
-"use client";
+'use client';
 
-import "@rainbow-me/rainbowkit/styles.css";
+import '@rainbow-me/rainbowkit/styles.css';
 
 import {
   RainbowKitProvider,
   darkTheme,
   getDefaultConfig,
-} from "@rainbow-me/rainbowkit";
+} from '@rainbow-me/rainbowkit';
 
 import {
   type GetSiweMessageOptions,
   RainbowKitSiweNextAuthProvider,
-} from "@rainbow-me/rainbowkit-siwe-next-auth";
+} from '@rainbow-me/rainbowkit-siwe-next-auth';
 
-import { SessionProvider } from "next-auth/react";
-import { WagmiProvider, http } from "wagmi";
-import * as wagmiChains from "wagmi/chains";
+import { SessionProvider } from 'next-auth/react';
+import { WagmiProvider, http } from 'wagmi';
+import * as wagmiChains from 'wagmi/chains';
 
-import { type FC, type PropsWithChildren } from "react";
+import { type FC, type PropsWithChildren } from 'react';
 
-import { env } from "~/env";
+import { env } from '~/env';
 
 const metadata = {
-  title: "Paid2Hack",
-  description: "Paid2Hack",
-  icons: [{ rel: "icon", url: "/favicon.ico" }],
+  title: 'Paid2Hack',
+  description: 'Paid2Hack',
+  icons: [{ rel: 'icon', url: '/favicon.ico' }],
 };
 
-import { ConnectWallet, Disclaimer } from "~/app/Components/UI/ConnectWallet";
+import { ConnectWallet, Disclaimer } from '~/app/Components/UI/ConnectWallet';
 
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import Link from "next/link";
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import Link from 'next/link';
 
 const getSiweMessageOptions: GetSiweMessageOptions = () => ({
   statement: `Sign in to ${metadata.title}`,
@@ -66,13 +66,15 @@ export const WagmiLayout: FC<PropsWithChildren<{}>> = ({ children }) => {
                 disclaimer: Disclaimer,
               }}
             >
-              <main className="relative min-h-screen bg-black text-white">
-                <div className="absolute left-2 top-2">
+              <nav className="flex items-center justify-between bg-black p-4">
+                <div className="">
                   <Link href="/">Home</Link>
                 </div>
                 <div className="absolute right-2 top-2">
                   <ConnectWallet />
                 </div>
+              </nav>
+              <main className="relative min-h-screen bg-black text-white">
                 <div className="relative top-10 p-4">{children}</div>
               </main>
             </RainbowKitProvider>

@@ -1,11 +1,11 @@
-import "~/styles/globals.css";
+import '~/styles/globals.css';
 
-import { Inter } from "next/font/google";
-import { WagmiLayout } from "./wagmi-layout";
+import { Inter, Montserrat } from 'next/font/google';
+import { WagmiLayout } from './wagmi-layout';
 
-const inter = Inter({
-  subsets: ["latin"],
-  variable: "--font-sans",
+const inter = Montserrat({
+  subsets: ['latin'],
+  variable: '--font-sans',
 });
 
 export default function RootLayout({
@@ -17,7 +17,7 @@ export default function RootLayout({
     <html lang="en">
       <body className={`font-sans ${inter.variable}`}>
         <WagmiLayout>
-          {children}
+          <div className="mx-auto max-w-screen-lg">{children}</div>
         </WagmiLayout>
       </body>
     </html>
