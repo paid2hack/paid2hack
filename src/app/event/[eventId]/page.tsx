@@ -8,27 +8,27 @@ import { LoadEventInfo } from "~/app/Components/UI/LoadEventInfo"
 import { TeamList } from "~/app/Components/UI/TeamList"
 import { UpdateEventNameDialog } from "~/app/Components/UI/UpdateEventNameDialog"
 
-export default function EventPage({ params }: { params: { id: number } }) {
-  const { id } = params
+export default function EventPage({ params }: { params: { eventId: number } }) {
+  const { eventId } = params
 
   return (
-    <LoadEventInfo eventId={id}>
+    <LoadEventInfo eventId={eventId}>
       {(ev) => (
         <div>
-          <h1>Event: {ev.name} (id: {id})</h1>
+          <h1>Event: {ev.name} (id: {eventId})</h1>
           <p className="my-2">Creator: {ev.owner}</p>
-          <IfEventCreator eventId={id}>
-            <UpdateEventNameDialog eventId={id}>
+          <IfEventCreator eventId={eventId}>
+            <UpdateEventNameDialog eventId={eventId}>
               <Button className="mb-2">Update event name</Button>
             </UpdateEventNameDialog>
           </IfEventCreator>
           <div className="mt-10">
             <h2>Teams</h2>
             <IfWalletConnected connectButton={null}>
-              <CreateTeamDialog eventId={id}>
+              <CreateTeamDialog eventId={eventId}>
                 <Button className="mb-4">Create team</Button>
               </CreateTeamDialog>
-              <TeamList eventId={id} />
+              <TeamList eventId={eventId} />
             </IfWalletConnected>
           </div>
         </div>

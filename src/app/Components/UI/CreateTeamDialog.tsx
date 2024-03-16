@@ -58,7 +58,7 @@ const Form: FC<{ id: number, info: EventInfo, closeDialog: CloseDialogCallback }
 
   return (
     <form className="flex flex-col" onSubmit={(e) => onSubmit(e, closeDialog)}>
-      <input className="text-black mb-4" type="text" placeholder="Event name" onChange={onNameChange} value={name} max={40} size={30} />
+      <input className="text-black mb-4" type="text" placeholder="Team name" onChange={onNameChange} value={name} max={40} size={30} />
       <p className="my-4">Team leader: {wallet?.address}</p>
       <Button className="mb-2" type="submit" disabled={!canSubmit}>Create team</Button>
       {error ? <ErrorBox>{error}</ErrorBox> : null}

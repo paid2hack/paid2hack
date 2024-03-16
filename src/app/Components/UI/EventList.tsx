@@ -14,7 +14,6 @@ const PER_PAGE = 10
 const List: FC<{ total: number, events: any }> = ({ total, events }) => {
   const items = useMemo(() => {
     const { pages = [] } = events
-    console.log(events)
 
     let tokenId = 1
     let ret: ReactNode[] = []
@@ -22,7 +21,7 @@ const List: FC<{ total: number, events: any }> = ({ total, events }) => {
     for (let i = 0; i < pages.length && ret.length < total; i++) {
       for (let j = 0; j < pages[i].length && ret.length < total; j++) {
         if (pages[i][j].error) {
-          ret.push(<li key={tokenId++}><ErrorBox>{pages[i][j].error}</ErrorBox></li>)
+          ret.push(<li key={tokenId++}><ErrorBox>{`${pages[i][j].error}`}</ErrorBox></li>)
         } else {
           const { name, owner } = pages[i][j].result
           if (owner !== zeroAddress) {

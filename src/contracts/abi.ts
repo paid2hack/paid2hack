@@ -62,8 +62,9 @@ export const MasterABi = [
       { name: "_teamIndex", type: "uint256", internalType: "uint256" },
     ],
     outputs: [
+      { name: "teamId_", type: "uint256", internalType: "uint256" },
       {
-        name: "",
+        name: "team_",
         type: "tuple",
         internalType: "struct Team",
         components: [

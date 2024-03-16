@@ -17,12 +17,14 @@ export const useEventTeams = (eventId: number, perPage: number) => {
   return useInfiniteReadContracts({
     cacheKey: "teams",
     contracts(pageParam) {
-      return [...new Array(perPage)].map((_, i) => ({
-        ...MASTER_CONTRACT_CONFIG,
-        functionName: "getEventTeam",
-        args: [eventId, pageParam + i],
-        watch: true,
-      }));
+      return [...new Array(perPage)].map((_, i) => {
+        return {
+          ...MASTER_CONTRACT_CONFIG,
+          functionName: "getEventTeam",
+          args: [eventId, pageParam + i - 1],
+          watch: true,
+        }
+      });
     },
     query: {
       initialPageParam: 1,

@@ -1,11 +1,7 @@
 "use client"
 
-import { FC, PropsWithChildren, ReactNode, useMemo } from "react"
-import { useWallet } from "~/app/hooks/wallet"
-import { useReadContract } from "wagmi"
-import { MASTER_CONTRACT_CONFIG } from "~/contracts"
+import { FC } from "react"
 import { ErrorBox } from "./ErrorBox"
-import { isSameEthereumAddress } from "~/app/lib/utils"
 import { Loading } from "./Loading"
 import { useEvent } from "~/app/hooks/event"
 
