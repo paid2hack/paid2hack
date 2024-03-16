@@ -6,9 +6,9 @@ import { useWriteContract } from "wagmi";
 import { MASTER_CONTRACT_CONFIG } from "~/contracts";
 import { Button } from "./Button";
 import { ErrorBox } from "./ErrorBox";
-import { EventInfo, LoadEventInfo } from "./LoadEventInfo";
+import { LoadTeamInfo, TeamInfo } from "./LoadTeamInfo";
 
-const Form: FC<{ id: number, info: EventInfo, closeDialog: CloseDialogCallback }> = ({ id, info, closeDialog }) => {
+const Form: FC<{ id: number, info: TeamInfo, closeDialog: CloseDialogCallback }> = ({ id, info, closeDialog }) => {
   const { writeContractAsync } = useWriteContract()
 
   const [name, setName] = useState(info.name);
@@ -35,7 +35,7 @@ const Form: FC<{ id: number, info: EventInfo, closeDialog: CloseDialogCallback }
 
       await writeContractAsync({
         ...MASTER_CONTRACT_CONFIG,
-        functionName: 'updateEventName',
+        functionName: 'updateTeamName',
         args: [BigInt(id), name],
       })
 
@@ -51,20 +51,20 @@ const Form: FC<{ id: number, info: EventInfo, closeDialog: CloseDialogCallback }
   return (
     <form className="flex flex-col" onSubmit={(e) => onSubmit(e, closeDialog)}>
       <input className="text-black mb-4" type="text" placeholder="Event name" onChange={onNameChange} value={name} max={40} size={30} />
-      <Button className="mb-2" type="submit" disabled={!canSubmit}>Update event name</Button>
+      <Button className="mb-2" type="submit" disabled={!canSubmit}>Update team name</Button>
       {error ? <ErrorBox>{error}</ErrorBox> : null}
     </form>
   )
 }
 
 
-export const UpdateEventNameDialog: FC<PropsWithChildren<{ eventId: number }>> = ({ eventId, children }) => {
+export const UpdateTeamNameDialog: FC<PropsWithChildren<{ teamId: number }>> = ({ teamId, children }) => {
   return (
     <ActionDialog
       renderContent={(closeDialog) => (
-        <LoadEventInfo eventId={eventId}>
-          {(ev) => <Form id={eventId} info={ev} closeDialog={closeDialog} />}
-        </LoadEventInfo>
+        <LoadTeamInfo teamId={teamId}>
+          {(team) => <Form id={teamId} info={team} closeDialog={closeDialog} />}
+        </LoadTeamInfo>
       )}
     >
       {children}
