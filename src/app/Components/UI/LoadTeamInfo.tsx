@@ -3,7 +3,6 @@
 import { FC, useMemo } from "react"
 import { ErrorBox } from "./ErrorBox"
 import { Loading } from "./Loading"
-import { EventInfo } from "./LoadEventInfo"
 import { useTeam } from "~/app/hooks/team"
 
 export interface TeamInfo {

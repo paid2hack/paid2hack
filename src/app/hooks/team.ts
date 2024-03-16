@@ -1,6 +1,6 @@
 import { useMemo } from "react";
 import { useInfiniteReadContracts, useReadContract } from "wagmi";
-import { MASTER_CONTRACT_CONFIG } from "~/contracts";
+import { DEFAULT_CONTRACT_QUERY_OPTIONS, MASTER_CONTRACT_CONFIG } from "~/contracts";
 
 export const useTeam = (teamId: number) => {
   return useReadContract({
@@ -8,7 +8,7 @@ export const useTeam = (teamId: number) => {
     functionName: "getTeam",
     args: [BigInt(teamId)],
     query: {
-      refetchInterval: 5000,
+      ...DEFAULT_CONTRACT_QUERY_OPTIONS,
     },
   });
 }
@@ -23,7 +23,7 @@ export const useEventTeams = (eventId: number, perPage: number) => {
           functionName: "getEventTeam",
           args: [eventId, pageParam + i - 1],
           watch: true,
-        }
+        };
       });
     },
     query: {
@@ -31,7 +31,7 @@ export const useEventTeams = (eventId: number, perPage: number) => {
       getNextPageParam: (_lastPage, _allPages, lastPageParam) => {
         return lastPageParam + perPage;
       },
-      refetchInterval: 5000,
+      ...DEFAULT_CONTRACT_QUERY_OPTIONS,
     },
   });
 }

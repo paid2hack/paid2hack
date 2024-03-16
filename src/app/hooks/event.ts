@@ -1,6 +1,6 @@
 import { useMemo } from "react";
 import { useInfiniteReadContracts, useReadContract } from "wagmi";
-import { MASTER_CONTRACT_CONFIG } from "~/contracts";
+import { DEFAULT_CONTRACT_QUERY_OPTIONS, MASTER_CONTRACT_CONFIG } from "~/contracts";
 
 export const useEvent = (eventId: number) => {
   return useReadContract({
@@ -8,7 +8,7 @@ export const useEvent = (eventId: number) => {
     functionName: "getEvent",
     args: [BigInt(eventId)],
     query: {
-      refetchInterval: 5000,
+      ...DEFAULT_CONTRACT_QUERY_OPTIONS,
     },
   });
 }
@@ -29,7 +29,7 @@ export const useEvents = (perPage: number) => {
       getNextPageParam: (_lastPage, _allPages, lastPageParam) => {
         return lastPageParam + perPage;
       },
-      refetchInterval: 5000,
+      ...DEFAULT_CONTRACT_QUERY_OPTIONS,
     },
   });
 }
@@ -40,7 +40,7 @@ export const useTotalEvents = () => {
     functionName: "totalEvents",
     args: [],
     query: {
-      refetchInterval: 5000,
+      ...DEFAULT_CONTRACT_QUERY_OPTIONS,
     },
   });
 }

@@ -17,7 +17,7 @@ export const ActionDialog: FC<PropsWithChildren<PropsWithClassName<Props>>> = ({
 
   return (
     <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-      <DialogTrigger>{children}</DialogTrigger>
+      <DialogTrigger asChild={true}>{children}</DialogTrigger>
       <DialogContent className={className}>
         {renderContent(closeDialog)}
       </DialogContent>

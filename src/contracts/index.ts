@@ -16,3 +16,7 @@ export const SPONSOR_CONTRACT_CONFIG = {
 } as const;
 
 export const SPONSOR_CONTRACT_BYTECODE = sponsorBytecode;
+
+export const DEFAULT_CONTRACT_QUERY_OPTIONS = {
+  refetchInterval: 3000,
+}
