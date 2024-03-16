@@ -74,8 +74,8 @@ export const WagmiLayout: FC<PropsWithChildren<{}>> = ({ children }) => {
                   <ConnectWallet />
                 </div>
               </nav>
-              <main className="relative  bg-black text-white">
-                <div className="relative top-10 ">{children}</div>
+              <main className="relative min-h-screen bg-black text-white">
+                <div className="top-10 ">{children}</div>
               </main>
             </RainbowKitProvider>
           </RainbowKitSiweNextAuthProvider>

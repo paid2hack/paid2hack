@@ -12,7 +12,7 @@ export function Header() {
 
   return (
     <div
-      className="relative h-[80vh] w-full overflow-clip rounded-md bg-black  dark:border dark:border-white/[0.1]"
+      className="relative w-full overflow-clip rounded-md bg-black  dark:border dark:border-white/[0.1]"
       ref={ref}
     >
       <EscrowAnimation />
