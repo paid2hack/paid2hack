@@ -1,6 +1,14 @@
 import { useMemo } from "react";
 import { useInfiniteReadContracts, useReadContract } from "wagmi";
 import { DEFAULT_CONTRACT_QUERY_OPTIONS, MASTER_CONTRACT_CONFIG } from "~/contracts";
+import { isSameEthereumAddress } from "../lib/utils";
+import { zeroAddress } from "viem";
+
+export interface TeamInfo {
+  name: string;
+  leader: `0x${string}`;
+  members: readonly `0x${string}`[];
+}
 
 export const useTeam = (teamId: number) => {
   return useReadContract({
@@ -13,8 +21,13 @@ export const useTeam = (teamId: number) => {
   });
 }
 
+export interface TeamIdTeamInfo {
+  teamId: number,
+  info: TeamInfo,
+}
+
 export const useEventTeams = (eventId: number, perPage: number) => {
-  return useInfiniteReadContracts({
+  const raw = useInfiniteReadContracts({
     cacheKey: "teams",
     contracts(pageParam) {
       return [...new Array(perPage)].map((_, i) => {
@@ -33,5 +46,53 @@ export const useEventTeams = (eventId: number, perPage: number) => {
       },
       ...DEFAULT_CONTRACT_QUERY_OPTIONS,
     },
-  });
+  })
+
+  const noErrors = useMemo(() => {
+    if (
+      raw.isLoading ||
+      raw.error ||
+      !raw.data
+    ) {
+      return false;
+    }
+
+    const { pages } = raw.data as any
+
+    for (let i = 0; i < pages.length; i++) {
+      for (let j = 0; j < pages[i].length; j++) {
+        if (pages[i][j].error) {
+          return false
+        }
+      }
+    }
+
+    return true
+  }, [raw.data, raw.error, raw.isLoading]);
+
+  const parsedData = useMemo(() => {
+    if (!noErrors) {
+      return null;
+    }
+
+    const ret: TeamIdTeamInfo[] = [];
+    const { pages } = raw.data as any;
+
+    for (let i = 0; i < pages.length; i++) {
+      for (let j = 0; j < pages[i].length; j++) {
+        const [teamId, team] = pages[i][j].result;
+
+        if (team.leader !== zeroAddress) {
+          ret.push({ teamId, info: team as TeamInfo })
+        }
+      }
+    }
+
+    return ret;
+  }, [noErrors, raw.data]);
+
+  return {
+    ...raw,
+    parsedData,
+  }
 }

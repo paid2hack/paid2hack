@@ -17,7 +17,7 @@ const List: FC<{ eventId: number, total: number, sponsors: SponsorInfo[] }> = ({
       const { name, totalPrizeMoney, address } = sponsors[i]!
 
       ret.push(
-        <Link className="p-4 border-white border rounded-md" href={`/event/${eventId}/sponsor/${address}`}>
+        <Link key={i} className="p-4 border-white border rounded-md" href={`/event/${eventId}/sponsor/${address}`}>
           <p className="bold mr-2">{name}</p>
           <p>Prize: {formatEther(totalPrizeMoney)} tokens</p>
         </Link>

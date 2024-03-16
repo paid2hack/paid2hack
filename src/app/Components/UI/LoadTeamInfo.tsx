@@ -3,15 +3,10 @@
 import { FC, useMemo } from "react"
 import { ErrorBox } from "./ErrorBox"
 import { Loading } from "./Loading"
-import { useTeam } from "~/app/hooks/team"
+import { TeamInfo, useTeam } from "~/app/hooks/team"
 import { useWallet } from "~/app/hooks/wallet"
 import { isSameEthereumAddress } from "~/app/lib/utils"
 
-export interface TeamInfo {
-  name: string
-  leader: `0x${string}`
-  members: readonly `0x${string}`[]
-}
 
 export const LoadTeamInfo: FC<{ teamId: number, children: (team: TeamInfo, isTeamLeader: boolean) => any }> = ({ children, teamId }) => {
   const wallet = useWallet()

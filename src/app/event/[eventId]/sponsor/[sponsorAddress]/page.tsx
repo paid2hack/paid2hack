@@ -1,8 +1,9 @@
 "use client"
 
 import Link from "next/link"
-import { ReactNode, useMemo } from "react"
+import { ReactNode, useCallback, useEffect, useMemo, useState } from "react"
 import { formatEther } from "viem"
+import { useWriteContract } from "wagmi"
 import { Button } from "~/app/Components/UI/Button"
 import { ErrorBox } from "~/app/Components/UI/ErrorBox"
 import { EventInfo, LoadEventInfo } from "~/app/Components/UI/LoadEventInfo"
@@ -11,11 +12,80 @@ import { LoadTeamInfo } from "~/app/Components/UI/LoadTeamInfo"
 import { Loading } from "~/app/Components/UI/Loading"
 import { UpdateSponsorNameDialog } from "~/app/Components/UI/UpdateSponsorNameDialog"
 import { SponsorInfo, useSponsor, useSponsorPrizes } from "~/app/hooks/sponsor"
-import { isSameEthereumAddress } from "~/app/lib/utils"
+import { useEventTeams } from "~/app/hooks/team"
+import { isEthereumAddress, isSameEthereumAddress } from "~/app/lib/utils"
+import { MASTER_CONTRACT_CONFIG } from "~/contracts"
 
-interface Params { event: EventInfo, sponsorAddress: string, sponsor: SponsorInfo, isSponsorOwner: boolean }
+interface Params { eventId: number, event: EventInfo, sponsorAddress: string, sponsor: SponsorInfo, isSponsorOwner: boolean }
 
-const SponsorInfo = ({ event, sponsorAddress, isSponsorOwner }: Params) => {
+const AllocateForm = (params: Params) => {
+  const { eventId, event } = params
+  
+  const { writeContractAsync } = useWriteContract()
+
+  const teams = useEventTeams(eventId, 20)
+
+  const [team, setTeam] = useState<number>()
+  const [updating, setUpdating] = useState(false)
+  const [error, setError] = useState()
+
+  // load all teams
+  useEffect(() => {
+    if (teams.parsedData && teams.parsedData.length < event.teamIds.length && !teams.isFetching) {
+      teams.fetchNextPage()
+    }
+  }, [event.teamIds.length, teams])
+
+  const canSubmit = useMemo(() => {
+    return !updating && !!team
+  }, [team, updating])
+
+  const onSubmit = useCallback(async (e: React.FormEvent<HTMLFormElement>) => {
+    try {
+      e.preventDefault()
+
+      setUpdating(true)
+      setError(undefined)
+    } catch (err: any) {
+      console.error(err)
+      setError(err.message)
+    } finally {
+      setUpdating(false)
+    }
+  }, [])
+
+  const onSelectTeam = useCallback((e: React.ChangeEvent<HTMLSelectElement>) => {
+    console.log(e)
+    setTeam(Number(e.target.value))
+  }, [])
+
+  if (teams.isLoading || !teams.parsedData) {
+    return <Loading />
+  }
+
+  if (teams.error) {
+    return <ErrorBox>{`${teams.error}`}</ErrorBox>
+  }
+
+  return (
+    <form className="mt-6" onSubmit={onSubmit}>
+      <h2>Allocate prize:</h2>
+      <div>
+        <label className="bold">Team:</label>
+        <select onChange={onSelectTeam} value={team}>
+          {teams.parsedData!.map((idAndInfo, i) => (
+            <option key={i} value={idAndInfo.teamId}>{idAndInfo.info.name}</option>
+          ))}
+        </select>
+      </div>
+      <Button className="mb-2" type="submit" disabled={!canSubmit}>Add new member</Button>
+      {error ? <ErrorBox>{error}</ErrorBox> : null}
+    </form>
+  )
+}
+
+const SponsorInfo = (params: Params) => {
+  const { event, sponsorAddress, isSponsorOwner } = params
   const sponsor = useSponsor(sponsorAddress)
   const prizes = useSponsorPrizes(sponsorAddress, event.teamIds as bigint[])
   
@@ -67,6 +137,9 @@ const SponsorInfo = ({ event, sponsorAddress, isSponsorOwner }: Params) => {
       <ul>
         {teamPrizes}
       </ul>
+      {isSponsorOwner && (
+        <AllocateForm {...params} />
+      )}
     </div>
   )
 }
@@ -93,7 +166,13 @@ export default function SponsorPage({ params }: { params: { eventId: string, spo
           {(sponsor, IfSponsorOwner) => (
             <div>
               <Link href={`/event/${eventId}`}><p className="italic text-sm">Event: {ev.name}</p></Link>
-              <SponsorInfoWrapper event={ev} sponsorAddress={sponsorAddress} sponsor={sponsor} isSponsorOwner={IfSponsorOwner} />
+              <SponsorInfoWrapper 
+                eventId={eventId}
+                event={ev} 
+                sponsorAddress={sponsorAddress} 
+                sponsor={sponsor} 
+                isSponsorOwner={IfSponsorOwner} 
+              />
             </div>
           )}
         </LoadSponsorInfo>

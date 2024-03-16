@@ -6,9 +6,10 @@ import { useWriteContract } from "wagmi"
 import { Button } from "~/app/Components/UI/Button"
 import { ErrorBox } from "~/app/Components/UI/ErrorBox"
 import { EventInfo, LoadEventInfo } from "~/app/Components/UI/LoadEventInfo"
-import { LoadTeamInfo, TeamInfo } from "~/app/Components/UI/LoadTeamInfo"
+import { LoadTeamInfo } from "~/app/Components/UI/LoadTeamInfo"
 import { Loading } from "~/app/Components/UI/Loading"
 import { UpdateTeamNameDialog } from "~/app/Components/UI/UpdateTeamNameDialog"
+import { TeamInfo } from "~/app/hooks/team"
 import { isEthereumAddress, isSameEthereumAddress } from "~/app/lib/utils"
 import { MASTER_CONTRACT_CONFIG } from "~/contracts"
 
@@ -60,7 +61,6 @@ const AddMemberForm = ({ teamId, teamInfo }: Params) => {
       {error ? <ErrorBox>{error}</ErrorBox> : null}
     </form>
   )
-
 }
 
 const Member = ({ teamId, teamInfo, member, isTeamLeader }: { member: string } & Params) => {

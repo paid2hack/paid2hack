@@ -1,4 +1,5 @@
 import { useMemo } from "react";
+import { zeroAddress } from "viem";
 import { useReadContracts } from "wagmi";
 import { DEFAULT_CONTRACT_QUERY_OPTIONS, SPONSOR_CONTRACT_CONFIG } from "~/contracts";
 import { env } from "~/env";
@@ -176,7 +177,14 @@ export const useSponsors = (sponsorAddresses: string[]) => {
     const ret: SponsorInfo[] = []
 
     for (let i = 0; i < sponsorAddresses.length; i++) {
-      ret.push(_parseSponsorInfoFromResultArray(sponsorAddresses[i]!, raw.data!.slice(i * 3, i * 3 + 3)))
+      const d = _parseSponsorInfoFromResultArray(
+        sponsorAddresses[i]!,
+        raw.data!.slice(i * 3, i * 3 + 3),
+      );
+
+      if (d.owner !== zeroAddress) {
+        ret.push(d)
+      }
     }
 
     return ret
