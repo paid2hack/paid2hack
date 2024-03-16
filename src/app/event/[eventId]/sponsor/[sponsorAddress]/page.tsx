@@ -5,15 +5,17 @@ import { ReactNode, useMemo } from "react"
 import { formatEther } from "viem"
 import { Button } from "~/app/Components/UI/Button"
 import { ErrorBox } from "~/app/Components/UI/ErrorBox"
-import { IfSponsorOwner } from "~/app/Components/UI/IfSponsorOwner"
 import { EventInfo, LoadEventInfo } from "~/app/Components/UI/LoadEventInfo"
+import { LoadSponsorInfo } from "~/app/Components/UI/LoadSponsorInfo"
 import { LoadTeamInfo } from "~/app/Components/UI/LoadTeamInfo"
 import { Loading } from "~/app/Components/UI/Loading"
 import { UpdateSponsorNameDialog } from "~/app/Components/UI/UpdateSponsorNameDialog"
-import { useSponsor, useSponsorPrizes } from "~/app/hooks/sponsor"
+import { SponsorInfo, useSponsor, useSponsorPrizes } from "~/app/hooks/sponsor"
 import { isSameEthereumAddress } from "~/app/lib/utils"
 
-const SponsorInfo = ({ event, sponsorAddress }: { event: EventInfo, sponsorAddress: string }) => {
+interface Params { event: EventInfo, sponsorAddress: string, sponsor: SponsorInfo, isSponsorOwner: boolean }
+
+const SponsorInfo = ({ event, sponsorAddress, isSponsorOwner }: Params) => {
   const sponsor = useSponsor(sponsorAddress)
   const prizes = useSponsorPrizes(sponsorAddress, event.teamIds as bigint[])
   
@@ -56,11 +58,11 @@ const SponsorInfo = ({ event, sponsorAddress }: { event: EventInfo, sponsorAddre
     <div>
       <h1>Name: {name}</h1>
       <h2>Total prize money: {formatEther(totalPrizeMoney || 0n)}</h2>
-      <IfSponsorOwner sponsorAddress={sponsorAddress}>
+      {isSponsorOwner && (
         <UpdateSponsorNameDialog sponsorAddress={sponsorAddress}>
           <Button className="mb-2">Update sponsor name</Button>
         </UpdateSponsorNameDialog>
-      </IfSponsorOwner>
+      )}
       <h2>Prizes allocated:</h2>
       <ul>
         {teamPrizes}
@@ -69,13 +71,14 @@ const SponsorInfo = ({ event, sponsorAddress }: { event: EventInfo, sponsorAddre
   )
 }
 
-const SponsorInfoWrapper = ({ event, sponsorAddress }: { event: EventInfo, sponsorAddress: string }) => {
+const SponsorInfoWrapper = (params: Params) => {
+  const { event, sponsorAddress } = params
   const isSponsorForEvent = useMemo(() => !!event.sponsors.find(a => isSameEthereumAddress(a, sponsorAddress)), [event.sponsors, sponsorAddress])
 
   if (!isSponsorForEvent) {
     return <ErrorBox>Sponsor not found for event</ErrorBox>
   } else {
-    return <SponsorInfo event={event} sponsorAddress={sponsorAddress} />
+    return <SponsorInfo {...params} />
   }
 }
 
@@ -86,10 +89,14 @@ export default function SponsorPage({ params }: { params: { eventId: string, spo
   return (
     <LoadEventInfo eventId={eventId}>
       {(ev) => (
-        <div>
-          <Link href={`/event/${eventId}`}><p className="italic text-sm">Event: {ev.name}</p></Link>
-          <SponsorInfoWrapper event={ev} sponsorAddress={sponsorAddress} />
-        </div>
+        <LoadSponsorInfo sponsorAddress={sponsorAddress}>
+          {(sponsor, IfSponsorOwner) => (
+            <div>
+              <Link href={`/event/${eventId}`}><p className="italic text-sm">Event: {ev.name}</p></Link>
+              <SponsorInfoWrapper event={ev} sponsorAddress={sponsorAddress} sponsor={sponsor} isSponsorOwner={IfSponsorOwner} />
+            </div>
+          )}
+        </LoadSponsorInfo>
       )}
     </LoadEventInfo>
   )

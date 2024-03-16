@@ -29,7 +29,7 @@ const Form: FC<{ id: number, info: EventInfo, closeDialog: CloseDialogCallback }
     return name.length > 0 && name.length < 40 && !creating
   }, [name, creating])
 
-  const onSubmit = useCallback(async (e: React.FormEvent<HTMLFormElement>, closeDialog: CloseDialogCallback) => {
+  const onSubmit = useCallback(async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     if (!canSubmit) {
@@ -60,10 +60,10 @@ const Form: FC<{ id: number, info: EventInfo, closeDialog: CloseDialogCallback }
     } finally {
       setCreating(false)
     }
-  }, [canSubmit, id, name, publicClient, router, wallet?.client])
+  }, [canSubmit, closeDialog, id, name, publicClient, router, wallet?.client])
 
   return (
-    <form className="flex flex-col" onSubmit={(e) => onSubmit(e, closeDialog)}>
+    <form className="flex flex-col" onSubmit={onSubmit}>
       <input className="text-black mb-4" type="text" placeholder="Sponsor name" onChange={onNameChange} value={name} max={40} size={30} />
       <Button className="mb-2" type="submit" disabled={!canSubmit}>Become a sponsor</Button>
       {error ? <ErrorBox>{error}</ErrorBox> : null}

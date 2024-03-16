@@ -3,7 +3,6 @@
 import { Button } from "~/app/Components/UI/Button"
 import { CreateSponsorDialog } from "~/app/Components/UI/CreateSponsorDialog"
 import { CreateTeamDialog } from "~/app/Components/UI/CreateTeamDialog"
-import { IfEventCreator } from "~/app/Components/UI/IfEventCreator"
 import { IfWalletConnected } from "~/app/Components/UI/IfWalletConnected"
 import { LoadEventInfo } from "~/app/Components/UI/LoadEventInfo"
 import { SponsorList } from "~/app/Components/UI/SponsorList"
@@ -15,15 +14,15 @@ export default function EventPage({ params }: { params: { eventId: string } }) {
 
   return (
     <LoadEventInfo eventId={eventId}>
-      {(ev) => (
+      {(ev, isEventCreator) => (
         <div>
           <h1>Event: {ev.name} (id: {eventId})</h1>
           <p className="my-2">Creator: {ev.owner}</p>
-          <IfEventCreator eventId={eventId}>
+          {isEventCreator && (
             <UpdateEventNameDialog eventId={eventId}>
               <Button className="mb-2">Update event name</Button>
             </UpdateEventNameDialog>
-          </IfEventCreator>
+          )}
           <div className="mt-10">
             <h2>Teams</h2>
             <IfWalletConnected connectButton={null}>

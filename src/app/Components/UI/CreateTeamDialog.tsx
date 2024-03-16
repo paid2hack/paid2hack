@@ -27,7 +27,7 @@ const Form: FC<{ id: number, info: EventInfo, closeDialog: CloseDialogCallback }
     return name.length > 0 && name.length < 40 && !creating
   }, [name, creating])
 
-  const onSubmit = useCallback(async (e: React.FormEvent<HTMLFormElement>, closeDialog: CloseDialogCallback) => {
+  const onSubmit = useCallback(async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     if (!canSubmit) {
@@ -54,10 +54,10 @@ const Form: FC<{ id: number, info: EventInfo, closeDialog: CloseDialogCallback }
     } finally {
       setCreating(false)
     }
-  }, [canSubmit, id, name, wallet, writeContractAsync])
+  }, [canSubmit, closeDialog, id, name, wallet, writeContractAsync])
 
   return (
-    <form className="flex flex-col" onSubmit={(e) => onSubmit(e, closeDialog)}>
+    <form className="flex flex-col" onSubmit={onSubmit}>
       <input className="text-black mb-4" type="text" placeholder="Team name" onChange={onNameChange} value={name} max={40} size={30} />
       <p className="my-4">Team leader: {wallet?.address}</p>
       <Button className="mb-2" type="submit" disabled={!canSubmit}>Create team</Button>
