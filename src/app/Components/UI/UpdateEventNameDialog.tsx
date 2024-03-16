@@ -6,11 +6,12 @@ import { useWriteContract } from "wagmi";
 import { MASTER_CONTRACT_CONFIG } from "~/contracts";
 import { Button } from "./Button";
 import { ErrorBox } from "./ErrorBox";
+import { EventInfo, LoadEventInfo } from "./LoadEventInfo";
 
-export const CreateEventDialog: FC<PropsWithChildren> = ({ children }) => {
+const Form: FC<{ id: number, info: EventInfo, closeDialog: CloseDialogCallback }> = ({ id, info, closeDialog }) => {
   const { writeContractAsync } = useWriteContract()
 
-  const [name, setName] = useState('');
+  const [name, setName] = useState(info.name);
   const [creating, setCreating] = useState(false);
   const [error, setError] = useState('');
 
@@ -34,8 +35,8 @@ export const CreateEventDialog: FC<PropsWithChildren> = ({ children }) => {
 
       await writeContractAsync({
         ...MASTER_CONTRACT_CONFIG,
-        functionName: 'createEvent',
-        args: [name],
+        functionName: 'updateEventName',
+        args: [BigInt(id), name],
       })
 
       closeDialog()
@@ -45,16 +46,25 @@ export const CreateEventDialog: FC<PropsWithChildren> = ({ children }) => {
     } finally {
       setCreating(false)
     }
-  }, [canSubmit, name, writeContractAsync])
+  }, [canSubmit, id, name, writeContractAsync])
 
+  return (
+    <form className="flex flex-col" onSubmit={(e) => onSubmit(e, closeDialog)}>
+      <input className="text-black mb-4" type="text" placeholder="Event name" onChange={onNameChange} value={name} max={40} size={30} />
+      <Button className="mb-2" type="submit" disabled={!canSubmit}>Save new name</Button>
+      {error ? <ErrorBox>{error}</ErrorBox> : null}
+    </form>
+  )
+}
+
+
+export const UpdateEventNameDialog: FC<PropsWithChildren<{ eventId: number }>> = ({ eventId, children }) => {
   return (
     <ActionDialog
       renderContent={(closeDialog) => (
-        <form className="flex flex-col" onSubmit={(e) => onSubmit(e, closeDialog)}>
-          <input className="text-black mb-4" type="text" placeholder="Event name" onChange={onNameChange} value={name} max={40} size={30} />
-          <Button className="mb-2" type="submit" disabled={!canSubmit}>Create event</Button>
-          {error ? <ErrorBox>{error}</ErrorBox> : null}
-        </form>
+        <LoadEventInfo eventId={eventId}>
+          {(ev) => <Form id={eventId} info={ev} closeDialog={closeDialog} />}
+        </LoadEventInfo>
       )}
     >
       {children}

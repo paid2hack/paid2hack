@@ -1,7 +1,9 @@
 "use client"
 
+import { Button } from "~/app/Components/UI/Button"
 import { IfEventCreator } from "~/app/Components/UI/IfEventCreator"
 import { LoadEventInfo } from "~/app/Components/UI/LoadEventInfo"
+import { UpdateEventNameDialog } from "~/app/Components/UI/UpdateEventNameDialog"
 
 export default function EventPage({ params }: { params: { id: number } }) {
   const { id } = params
@@ -12,7 +14,9 @@ export default function EventPage({ params }: { params: { id: number } }) {
         <div>
           <h1>Event: {ev.name}</h1>
           <IfEventCreator eventId={id}>
-            <div>You are the creator of this event.</div>
+            <UpdateEventNameDialog eventId={id}>
+              <Button className="mb-2">Update event name</Button>
+            </UpdateEventNameDialog>
           </IfEventCreator>
         </div>
       )}

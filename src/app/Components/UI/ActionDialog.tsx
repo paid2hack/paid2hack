@@ -1,15 +1,14 @@
-import { useState, useCallback, ReactNode, FC } from "react"
+import { useState, useCallback, ReactNode, FC, PropsWithChildren } from "react"
 import { PropsWithClassName } from "~/ui/utils"
 import { Dialog, DialogContent, DialogTrigger } from "./Dialog"
 
 export type CloseDialogCallback = () => void
 
 interface Props {
-  triggerElement: ReactNode
   renderContent: (closeDialog: CloseDialogCallback) => ReactNode
 }
 
-export const ActionDialog: FC<PropsWithClassName<Props>> = ({ triggerElement, renderContent, className }) => {
+export const ActionDialog: FC<PropsWithChildren<PropsWithClassName<Props>>> = ({ children, renderContent, className }) => {
   const [dialogOpen, setDialogOpen] = useState(false)
 
   const closeDialog = useCallback(() => {
@@ -18,7 +17,7 @@ export const ActionDialog: FC<PropsWithClassName<Props>> = ({ triggerElement, re
 
   return (
     <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-      <DialogTrigger>{triggerElement}</DialogTrigger>
+      <DialogTrigger>{children}</DialogTrigger>
       <DialogContent className={className}>
         {renderContent(closeDialog)}
       </DialogContent>
