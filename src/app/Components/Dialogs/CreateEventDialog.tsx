@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import {
   FC,
@@ -7,19 +7,19 @@ import {
   useCallback,
   useMemo,
   useState,
-} from "react";
-import { ActionDialog, CloseDialogCallback } from "./ActionDialog";
-import { useWriteContract } from "wagmi";
-import { MASTER_CONTRACT_CONFIG } from "~/contracts";
-import { Button } from "./Button";
-import { ErrorBox } from "./ErrorBox";
+} from 'react';
+import { ActionDialog, CloseDialogCallback } from './ActionDialog';
+import { useWriteContract } from 'wagmi';
+import { MASTER_CONTRACT_CONFIG } from '~/contracts';
+import { Button } from '../UI/Button';
+import { ErrorBox } from '../UI/ErrorBox';
 
 export const CreateEventDialog: FC<PropsWithChildren> = ({ children }) => {
   const { writeContractAsync } = useWriteContract();
 
-  const [name, setName] = useState("");
+  const [name, setName] = useState('');
   const [creating, setCreating] = useState(false);
-  const [error, setError] = useState("");
+  const [error, setError] = useState('');
 
   const onNameChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     setName(e.target.value);
@@ -45,7 +45,7 @@ export const CreateEventDialog: FC<PropsWithChildren> = ({ children }) => {
 
         await writeContractAsync({
           ...MASTER_CONTRACT_CONFIG,
-          functionName: "createEvent",
+          functionName: 'createEvent',
           args: [name],
         });
 
