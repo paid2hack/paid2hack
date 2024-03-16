@@ -72,7 +72,7 @@ export const TeamSelector: FC<{ onSelect: (teamId: number) => void, event: Event
       </PopoverTrigger>
       <PopoverContent className="w-[200px] p-0">
         <Command>
-          <CommandInput placeholder="Search framework..." />
+          <CommandInput placeholder="Search team..." />
           <CommandList>
             <CommandEmpty>No teams found</CommandEmpty>
             <CommandGroup>
