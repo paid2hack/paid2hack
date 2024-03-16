@@ -35,7 +35,7 @@ export default function OrganizersPage() {
         abi: MasterABi,
         address: env.NEXT_PUBLIC_MASTER_CONTRACT as `0x${string}`,
         functionName: 'createEvent',
-        args: [ name ],
+        args: [name],
       })
 
       const { logs } = await publicClient!.waitForTransactionReceipt({ hash });
