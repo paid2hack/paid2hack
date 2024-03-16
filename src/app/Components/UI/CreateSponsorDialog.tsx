@@ -1,7 +1,7 @@
 "use client"
 
 import { FC, PropsWithChildren, useCallback, useMemo, useState } from "react";
-import { ActionDialog, CloseDialogCallback } from "./ActionDialog";
+import { ActionDialog, CloseDialogCallback } from "~/app/Components/Dialogs/ActionDialog";
 import { usePublicClient, useWriteContract } from "wagmi";
 import { MASTER_CONTRACT_CONFIG, SPONSOR_CONTRACT_BYTECODE, SPONSOR_CONTRACT_CONFIG } from "~/contracts";
 import { Button } from "./Button";

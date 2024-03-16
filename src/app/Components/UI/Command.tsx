@@ -6,7 +6,7 @@ import { Command as CommandPrimitive } from "cmdk"
 import { Search } from "lucide-react"
 
 import { cn } from "~/app/lib/utils"
-import { Dialog, DialogContent } from "~/app/Components/UI/Dialog"
+import { Dialog, DialogContent } from "~/app/Components/UI/dialog"
 
 /*
 NOTE: Contains fixes for cmdk, see https://github.com/shadcn-ui/ui/issues/2944#issuecomment-1998208488

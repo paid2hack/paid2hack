@@ -15,13 +15,15 @@ const List: FC<{ eventId: number, total: number, teams: TeamIdTeamInfo[] }> = ({
     let itemIndex = 0
 
     for (let i = 0; i < total; i++) {
-      const { teamId, info } = teams[i]!
+      if (teams[i]) {
+        const { teamId, info } = teams[i]!
 
-      ret.push(
-        <li className="mb-5" key={itemIndex++}>
-          <Link className="p-4 border-white border rounded-md" href={`/event/${eventId}/team/${teamId}`}>{info.name}</Link>
-        </li>
-      )
+        ret.push(
+          <li className="mb-5" key={itemIndex++}>
+            <Link className="p-4 border-white border rounded-md" href={`/event/${eventId}/team/${teamId}`}>{info.name}</Link>
+          </li>
+        )
+      }
     }
 
     return ret

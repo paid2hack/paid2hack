@@ -3,16 +3,9 @@
 import { FC, useMemo } from "react"
 import { ErrorBox } from "./ErrorBox"
 import { Loading } from "./Loading"
-import { useEvent } from "~/app/hooks/event"
+import { EventInfo, useEvent } from "~/app/hooks/event"
 import { useWallet } from "~/app/hooks/wallet"
 import { isSameEthereumAddress } from "~/app/lib/utils"
-
-export interface EventInfo {
-  name: string
-  owner: `0x${string}`
-  teamIds: readonly bigint[]
-  sponsors: readonly string[]
-}
 
 /**
  * Load event info and render children once done.

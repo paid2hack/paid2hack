@@ -14,14 +14,16 @@ const List: FC<{ eventId: number, total: number, sponsors: SponsorInfo[] }> = ({
     let itemIndex = 0
 
     for (let i = 0; i < total; i++) {
-      const { name, totalPrizeMoney, address } = sponsors[i]!
+      if (sponsors[i]) {
+        const { name, totalPrizeMoney, address } = sponsors[i]!
 
-      ret.push(
-        <Link key={i} className="p-4 border-white border rounded-md" href={`/event/${eventId}/sponsor/${address}`}>
-          <p className="bold mr-2">{name}</p>
-          <p>Prize: {formatEther(totalPrizeMoney)} tokens</p>
-        </Link>
-      )
+        ret.push(
+          <Link key={i} className="p-4 border-white border rounded-md" href={`/event/${eventId}/sponsor/${address}`}>
+            <p className="bold mr-2">{name}</p>
+            <p>Prize: {formatEther(totalPrizeMoney)} tokens</p>
+          </Link>
+        )
+      }
     }
 
     return ret

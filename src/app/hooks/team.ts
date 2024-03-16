@@ -1,7 +1,6 @@
 import { useMemo } from "react";
 import { useInfiniteReadContracts, useReadContract } from "wagmi";
 import { DEFAULT_CONTRACT_QUERY_OPTIONS, MASTER_CONTRACT_CONFIG } from "~/contracts";
-import { isSameEthereumAddress } from "../lib/utils";
 import { zeroAddress } from "viem";
 
 export interface TeamInfo {
