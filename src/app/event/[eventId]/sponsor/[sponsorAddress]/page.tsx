@@ -236,3 +236,70 @@ export default function SponsorPage({
     </div>
   );
 }
+
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useForm } from 'react-hook-form';
+import { z } from 'zod';
+
+import {
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '~/app/Components/UI/Form/form';
+import { Input } from '~/app/Components/UI/Form/input';
+
+export const allocatePrizeFormSchema = z.object({
+  amount: z.number().min(1, {
+    message: 'Prize amount must be at least 1 token.',
+  }),
+});
+
+export function AllocatePrizeForm({
+  onSubmit,
+}: {
+  onSubmit: (data: z.infer<typeof allocatePrizeFormSchema>) => void;
+}) {
+  // 1. Define your form.
+  const form = useForm<z.infer<typeof allocatePrizeFormSchema>>({
+    resolver: zodResolver(allocatePrizeFormSchema),
+    defaultValues: {
+      amount: 0,
+    },
+  });
+
+  return (
+    <Form {...form}>
+      <form
+        onSubmit={form.handleSubmit((data) => onSubmit(data))}
+        className="space-y-8"
+      >
+        <FormField
+          control={form.control}
+          name="amount"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Prize Amount</FormLabel>
+              <FormControl>
+                <Input
+                  type="number"
+                  placeholder="Enter the prize amount"
+                  {...field}
+                />
+              </FormControl>
+              <FormDescription>
+                Specify the number of tokens to allocate as a prize.
+              </FormDescription>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <Button type="submit">Allocate Prize</Button>
+      </form>
+    </Form>
+  );
+}
