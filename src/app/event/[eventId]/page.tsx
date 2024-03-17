@@ -26,7 +26,7 @@ export default function EventPage({ params }: { params: { eventId: number } }) {
         <div className="min-h-screen bg-gray-900 px-8 py-10">
           <Card className="border border-gray-700 bg-gray-800 shadow-md">
             <CardHeader>
-              <CardTitle className="text-xl font-bold text-gray-100">
+              <CardTitle className="text-3xl font-black text-gray-100">
                 {ev.name}
               </CardTitle>
               <p className="mt-1 text-sm text-gray-400">
@@ -35,13 +35,7 @@ export default function EventPage({ params }: { params: { eventId: number } }) {
               </p>
             </CardHeader>
             <Separator className="my-4 border-gray-700" />
-            <div className="mt-4 flex items-center space-x-4">
-              <Button
-                variant="ghost"
-                className="text-gray-300 hover:bg-gray-700 hover:text-gray-100"
-              >
-                Site
-              </Button>
+            <div className="m-4 flex items-center space-x-4">
               {isEventCreator && (
                 <UpdateEventNameDialog eventId={eventId}>
                   <Button className="bg-gray-700 text-gray-300 hover:bg-gray-600 hover:text-gray-100">

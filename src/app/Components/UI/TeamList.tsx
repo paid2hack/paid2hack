@@ -57,8 +57,10 @@ const TeamListInner: FC<{ eventId: number; teamIds: readonly bigint[] }> = ({
   const isLoading = useMemo(() => teams.isLoading, [teams.isLoading]);
 
   return (
-    <div className="container mx-auto">
-      <h2 className="mb-6 text-2xl font-bold text-gray-100">Team List</h2>
+    <div className="w-full">
+      <h2 className="mb-6 w-full text-2xl font-bold text-gray-100">
+        Team List
+      </h2>
       {error && <ErrorBox>Error loading events: {`${error}`}</ErrorBox>}
       {isLoading && <Loading />}
       {teams.parsedData && (

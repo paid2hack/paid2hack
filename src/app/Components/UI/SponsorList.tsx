@@ -20,10 +20,10 @@ const List: FC<{ eventId: number; total: number; sponsors: SponsorInfo[] }> = ({
         ret.push(
           <Link
             key={i}
-            className="mb-4 block rounded-md bg-gray-800 p-4 shadow-md transition duration-300 ease-in-out hover:bg-gray-700 hover:shadow-lg"
+            className="block transform rounded-lg bg-gray-700 p-3 shadow-md transition duration-300 ease-in-out hover:-translate-y-1 hover:bg-gray-600 hover:shadow-lg"
             href={`/event/${eventId}/sponsor/${address}`}
           >
-            <p className="mb-2 text-lg font-bold text-gray-100">{name}</p>
+            <h3 className="text-lg font-semibold text-gray-100">{name}</h3>
             <p className="text-gray-300">
               Prize: {formatEther(allocatedPrizeMoney)} tokens
             </p>
