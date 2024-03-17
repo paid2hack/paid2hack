@@ -4,6 +4,8 @@
 
 _Incubated at [ETHGlobal London 2024](https://ethglobal.com/events/london2024)._
 
+Live site: https://paid2hack.com
+
 An on-chain hackathon prize money management system.
 
 * Organizers:
