@@ -17,35 +17,30 @@ import { LoadEventInfo } from './LoadEventInfo';
 import { useWallet } from '~/app/hooks/wallet';
 import { useRouter } from 'next/navigation';
 import { EventInfo } from '~/app/hooks/event';
+import { z } from 'zod';
+import { Input } from './Form/input';
+import { SponsorForm } from '../Dialogs/SponsorForm';
 
-const Form: FC<{
-  id: number;
-  info: EventInfo;
-  closeDialog: CloseDialogCallback;
-}> = ({ id, info, closeDialog }) => {
-  const router = useRouter();
+const sponsorFormSchema = z.object({
+  name: z.string().min(1).max(40),
+});
 
+export const CreateSponsorDialog: FC<
+  PropsWithChildren<{ eventId: number }>
+> = ({ eventId, children }) => {
   const wallet = useWallet();
+  const router = useRouter();
   const publicClient = usePublicClient();
   const { writeContractAsync } = useWriteContract();
-
-  const [name, setName] = useState('');
   const [creating, setCreating] = useState(false);
   const [error, setError] = useState('');
 
-  const onNameChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    setName(e.target.value);
-  }, []);
-
-  const canSubmit = useMemo(() => {
-    return name.length > 0 && name.length < 40 && !creating;
-  }, [name, creating]);
-
   const onSubmit = useCallback(
-    async (e: React.FormEvent<HTMLFormElement>) => {
-      e.preventDefault();
-
-      if (!canSubmit) {
+    async (
+      data: z.infer<typeof sponsorFormSchema>,
+      closeDialog: CloseDialogCallback,
+    ) => {
+      if (creating) {
         return;
       }
 
@@ -54,7 +49,7 @@ const Form: FC<{
 
         const hash = await wallet?.client.deployContract({
           ...SPONSOR_CONTRACT_CONFIG,
-          args: [MASTER_CONTRACT_CONFIG.address, BigInt(id), name],
+          args: [MASTER_CONTRACT_CONFIG.address, BigInt(eventId), data.name],
           bytecode: SPONSOR_CONTRACT_BYTECODE,
         });
 
@@ -67,7 +62,7 @@ const Form: FC<{
 
         console.log(`Deployed at: ${contractAddress}`);
 
-        router.push(`/event/${id}/sponsor/${contractAddress}`);
+        router.push(`/event/${eventId}/sponsor/${contractAddress}`);
 
         closeDialog();
       } catch (err: any) {
@@ -77,36 +72,21 @@ const Form: FC<{
         setCreating(false);
       }
     },
-    [canSubmit, closeDialog, id, name, publicClient, router, wallet?.client],
+    [creating, eventId, publicClient, router, wallet?.client],
   );
 
-  return (
-    <form className="flex flex-col" onSubmit={onSubmit}>
-      <input
-        className="mb-4 text-black"
-        type="text"
-        placeholder="Sponsor name"
-        onChange={onNameChange}
-        value={name}
-        max={40}
-        size={30}
-      />
-      <Button className="mb-2" type="submit" disabled={!canSubmit}>
-        Become a sponsor
-      </Button>
-      {error ? <ErrorBox>{error}</ErrorBox> : null}
-    </form>
-  );
-};
-
-export const CreateSponsorDialog: FC<
-  PropsWithChildren<{ eventId: number }>
-> = ({ eventId, children }) => {
   return (
     <ActionDialog
-      renderContent={(closeDialog) => (
+      dialogTitle={dialogTitle}
+      dialogDescription="Enter the details to become a sponsor for the event."
+      renderContent={(closeDialog: any) => (
         <LoadEventInfo eventId={eventId}>
-          {(ev) => <Form id={eventId} info={ev} closeDialog={closeDialog} />}
+          {(ev) => (
+            <>
+              <SponsorForm onSubmit={(data) => onSubmit(data, closeDialog)} />
+              {error ? <ErrorBox>{error}</ErrorBox> : null}
+            </>
+          )}
         </LoadEventInfo>
       )}
     >
@@ -114,3 +94,9 @@ export const CreateSponsorDialog: FC<
     </ActionDialog>
   );
 };
+
+const dialogTitle = (
+  <div className="text-2xl">
+    <span className="text-[hsl(280,100%,70%)]">Become</span> a Sponsor
+  </div>
+);
