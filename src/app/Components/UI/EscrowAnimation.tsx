@@ -34,7 +34,7 @@ export const EscrowAnimation = ({
   }, [pathControls]);
 
   return (
-    <div className={cn('sticky top-10', className)}>
+    <div className={cn('my-10', className)}>
       <h1 className="text-center text-5xl font-extrabold tracking-tight text-white sm:text-[5rem]">
         {title || (
           <div className="flex w-full items-center justify-center gap-2">

@@ -1,63 +1,77 @@
-"use client"
+'use client';
+import { FC, ReactNode, useMemo } from 'react';
+import { ErrorBox } from './ErrorBox';
+import { TeamIdTeamInfo, useEventTeams } from '~/app/hooks/team';
+import { LoadEventInfo } from './LoadEventInfo';
+import { Loading } from './Loading';
+import Link from 'next/link';
 
-import { FC, ReactNode, useMemo } from "react";
-import { ErrorBox } from "./ErrorBox";
-import { TeamIdTeamInfo, useEventTeams } from "~/app/hooks/team";
-import { LoadEventInfo } from "./LoadEventInfo";
-import { Loading } from "./Loading";
-import Link from "next/link";
+const PER_PAGE = 10;
 
-const PER_PAGE = 10
-
-const List: FC<{ eventId: number, total: number, teams: TeamIdTeamInfo[] }> = ({ eventId, total, teams }) => {
+const List: FC<{ eventId: number; total: number; teams: TeamIdTeamInfo[] }> = ({
+  eventId,
+  total,
+  teams,
+}) => {
   const items = useMemo(() => {
-    let ret: ReactNode[] = []
-    let itemIndex = 0
-
+    let ret: ReactNode[] = [];
+    let itemIndex = 0;
     for (let i = 0; i < total; i++) {
       if (teams[i]) {
-        const { teamId, info } = teams[i]!
-
+        const { teamId, info } = teams[i]!;
         ret.push(
-          <li className="mb-5" key={itemIndex++}>
-            <Link className="p-4 border-white border rounded-md" href={`/event/${eventId}/team/${teamId}`}>{info.name}</Link>
-          </li>
-        )
+          <li className="" key={itemIndex++}>
+            <Link
+              className="block transform rounded-lg bg-gray-700 p-3 shadow-md transition duration-300 ease-in-out hover:-translate-y-1 hover:bg-gray-600 hover:shadow-lg"
+              href={`/event/${eventId}/team/${teamId}`}
+            >
+              <h3 className="text-lg font-semibold text-gray-100">
+                {info.name}
+              </h3>
+              <p className="text-sm text-gray-300">Team ID: {teamId}</p>
+            </Link>
+          </li>,
+        );
       }
     }
-
-    return ret
-  }, [eventId, teams, total])
-
-  return <ul className="flex flex-col justify-start items-start">{items}</ul>
-}
-
-const TeamListInner: FC<{ eventId: number, teamIds: readonly bigint[] }> = ({ eventId, teamIds }) => {
-  const totalTeams = useMemo(() => {
-    return Number(teamIds.length)
-  }, [teamIds.length])
-
-  const teams = useEventTeams(eventId, PER_PAGE)
-
-  const error = useMemo(() => teams.error, [teams.error])
-  const isLoading = useMemo(() => teams.isLoading, [teams.isLoading])
+    return ret;
+  }, [eventId, teams, total]);
 
   return (
-    <>
+    <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      {items}
+    </ul>
+  );
+};
+
+const TeamListInner: FC<{ eventId: number; teamIds: readonly bigint[] }> = ({
+  eventId,
+  teamIds,
+}) => {
+  const totalTeams = useMemo(() => {
+    return Number(teamIds.length);
+  }, [teamIds.length]);
+
+  const teams = useEventTeams(eventId, PER_PAGE);
+  const error = useMemo(() => teams.error, [teams.error]);
+  const isLoading = useMemo(() => teams.isLoading, [teams.isLoading]);
+
+  return (
+    <div className="container mx-auto">
+      <h2 className="mb-6 text-2xl font-bold text-gray-100">Team List</h2>
       {error && <ErrorBox>Error loading events: {`${error}`}</ErrorBox>}
       {isLoading && <Loading />}
-      {teams.parsedData && <List eventId={eventId} total={totalTeams} teams={teams.parsedData} />}
-    </>
-  )
-}
+      {teams.parsedData && (
+        <List eventId={eventId} total={totalTeams} teams={teams.parsedData} />
+      )}
+    </div>
+  );
+};
 
 export const TeamList: FC<{ eventId: number }> = ({ eventId }) => {
   return (
     <LoadEventInfo eventId={eventId}>
-      {(ev) => (
-        <TeamListInner eventId={eventId} teamIds={ev.teamIds} />
-      )}
+      {(ev) => <TeamListInner eventId={eventId} teamIds={ev.teamIds} />}
     </LoadEventInfo>
-  )
-}
-
+  );
+};
