@@ -30,5 +30,7 @@ jobs:
           node-version: "20"
       - name: Install dependencies
         run: bun i
+      - name: Test env vars
+        run: cp env.example .env
       - name: Build with Next.js
         run: npm run build
