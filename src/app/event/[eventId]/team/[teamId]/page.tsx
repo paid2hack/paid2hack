@@ -11,7 +11,7 @@ import { LoadEventInfo } from '~/app/Components/UI/LoadEventInfo';
 import { LoadTeamInfo } from '~/app/Components/UI/LoadTeamInfo';
 import { Loading } from '~/app/Components/UI/Loading';
 import { EventInfo } from '~/app/hooks/event';
-import { useSponsor, useSponsorClaimablePrizeByWallet, useSponsorPrizes } from '~/app/hooks/sponsor';
+import { useSponsor, useSponsorClaimablePrizeByWallet } from '~/app/hooks/sponsor';
 import { TeamInfo } from '~/app/hooks/team';
 import { useWallet } from '~/app/hooks/wallet';
 import { isEthereumAddress, isSameEthereumAddress } from '~/app/lib/utils';

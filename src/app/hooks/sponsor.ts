@@ -12,11 +12,6 @@ export interface SponsorInfo {
   unallocatablePrizeMoney: bigint;
 }
 
-export interface TeamPrizeInfo {
-  teamId: number
-  token: string
-  prize: bigint
-}
 
 const _parseSponsorInfoFromResultArray = (address: string, data: any[]) => {
   return {
@@ -83,18 +78,33 @@ export const useSponsor = (sponsorAddress: string) => {
   };
 }
 
+export interface SponsorPrizeInfo {
+  teamId: number;
+  token: string;
+  amount: bigint;
+  claimed: bigint;
+}
+
 export const useSponsorPrizes = (sponsorAddress: string, teamIds: bigint[]) => {
   const address = sponsorAddress as `0x${string}`;
 
   const raw = useReadContracts({
-    contracts: teamIds.map((id) => [
-      {
-        ...SPONSOR_CONTRACT_CONFIG,
-        address,
-        functionName: "getPrizeAmount",
-        args: [id, env.NEXT_PUBLIC_PAYMENT_TOKEN_CONTRACT],
-      },
-    ]).flat(),
+    contracts: teamIds
+      .map((id) => [
+        {
+          ...SPONSOR_CONTRACT_CONFIG,
+          address,
+          functionName: "getPrizeAmount",
+          args: [id, env.NEXT_PUBLIC_PAYMENT_TOKEN_CONTRACT],
+        },
+        {
+          ...SPONSOR_CONTRACT_CONFIG,
+          address,
+          functionName: "getClaimedAmount",
+          args: [id, env.NEXT_PUBLIC_PAYMENT_TOKEN_CONTRACT],
+        },
+      ])
+      .flat(),
     query: {
       ...DEFAULT_CONTRACT_QUERY_OPTIONS,
     },
@@ -105,7 +115,7 @@ export const useSponsorPrizes = (sponsorAddress: string, teamIds: bigint[]) => {
       raw.isLoading ||
       raw.error ||
       !raw.data ||
-      raw.data.length !== teamIds.length
+      raw.data.length !== teamIds.length * 2
     ) {
       return false;
     }
@@ -120,14 +130,15 @@ export const useSponsorPrizes = (sponsorAddress: string, teamIds: bigint[]) => {
       return null;
     }
 
-    const ret: TeamPrizeInfo[] = [];
+    const ret: SponsorPrizeInfo[] = [];
 
-    for (let i = 0; i < teamIds.length; i++) {
+    for (let i = 0; i < (teamIds.length * 2); i += 2) {
       ret.push({
         teamId: Number(teamIds[i]),
         token: env.NEXT_PUBLIC_PAYMENT_TOKEN_CONTRACT,
-        prize: BigInt(raw.data![i]!.result!),
-      })  
+        amount: BigInt(raw.data![i]!.result!),
+        claimed: BigInt(raw.data![i + 1]!.result!),
+      });  
     }
 
     return ret;

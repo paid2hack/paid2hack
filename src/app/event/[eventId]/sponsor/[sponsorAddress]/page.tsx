@@ -105,7 +105,7 @@ const SponsorInfo = (params: Params) => {
           <li key={itemIndex++}>
             <LoadTeamInfo teamId={prizes.parsedData[i]!.teamId}>
               {(team) => (
-              <p>{team.name} - {formatEther(prizes.parsedData![i]!.prize)} tokens</p>
+                <p>{team.name} - {formatEther(prizes.parsedData![i]!.amount)} tokens ({formatEther(prizes.parsedData![i]!.claimed)} claimed)</p>
               )}
             </LoadTeamInfo>
           </li>
