@@ -190,18 +190,20 @@ const SponsorInfoInner = (params: Params) => {
 
     if (prizes.parsedData) {
       for (let i = 0; i < event.teamIds.length; i++) {
-        ret.push(
-          <li key={itemIndex++} className="mb-2">
-            <LoadTeamInfo teamId={prizes.parsedData[i]!.teamId}>
-              {(team) => (
-                <p className="text-gray-300">
-                  {team.name} - {formatEther(prizes.parsedData![i]!.amount)}{' '}
-                  tokens ({formatEther(prizes.parsedData![i]!.claimed)} claimed)
-                </p>
-              )}
-            </LoadTeamInfo>
-          </li>,
-        );
+        if (prizes.parsedData[i]?.teamId) {
+          ret.push(
+            <li key={itemIndex++} className="mb-2">
+              <LoadTeamInfo teamId={prizes.parsedData[i]!.teamId}>
+                {(team) => (
+                  <p className="text-gray-300">
+                    {team.name} - {formatEther(prizes.parsedData![i]!.amount)}{' '}
+                    tokens ({formatEther(prizes.parsedData![i]!.claimed)} claimed)
+                  </p>
+                )}
+              </LoadTeamInfo>
+            </li>,
+          );
+        }
       }
     }
 

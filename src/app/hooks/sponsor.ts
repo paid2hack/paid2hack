@@ -135,7 +135,7 @@ export const useSponsorPrizes = (sponsorAddress: string, teamIds: bigint[]) => {
 
     for (let i = 0; i < (teamIds.length * 2); i += 2) {
       ret.push({
-        teamId: Number(teamIds[i]),
+        teamId: Number(teamIds[i / 2]),
         token: env.NEXT_PUBLIC_PAYMENT_TOKEN_CONTRACT,
         amount: BigInt(raw.data![i]!.result!),
         claimed: BigInt(raw.data![i + 1]!.result!),
