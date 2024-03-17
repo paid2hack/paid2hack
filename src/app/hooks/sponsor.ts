@@ -1,6 +1,6 @@
 import { useMemo } from "react";
 import { zeroAddress } from "viem";
-import { useReadContracts } from "wagmi";
+import { useReadContract, useReadContracts } from "wagmi";
 import { DEFAULT_CONTRACT_QUERY_OPTIONS, SPONSOR_CONTRACT_CONFIG } from "~/contracts";
 import { env } from "~/env";
 
@@ -139,6 +139,22 @@ export const useSponsorPrizes = (sponsorAddress: string, teamIds: bigint[]) => {
   }
 };
 
+export const useSponsorClaimablePrizeByWallet = (sponsorAddress: string, teamId: number, wallet: string) => {
+  const address = sponsorAddress as `0x${string}`;
+
+  return useReadContract({
+    ...SPONSOR_CONTRACT_CONFIG,
+    address,
+    functionName: "getClaimablePrize",
+    args: [BigInt(teamId), wallet as `0x${string}`, env.NEXT_PUBLIC_PAYMENT_TOKEN_CONTRACT as `0x${string}`],
+    query: {
+      ...DEFAULT_CONTRACT_QUERY_OPTIONS,
+    },
+  });
+}
+
+const RESULT_LEN = _getContractCalls(zeroAddress).length;
+
 export const useSponsors = (sponsorAddresses: string[]) => {
   const raw = useReadContracts({
     contracts: sponsorAddresses.map((a) => _getContractCalls(a as `0x${string}`)).flat(),
@@ -148,7 +164,12 @@ export const useSponsors = (sponsorAddresses: string[]) => {
   });  
 
   const noErrors = useMemo(() => {
-    if (raw.isLoading || raw.error || !raw.data || raw.data.length !== sponsorAddresses.length * 3) {
+    if (
+      raw.isLoading ||
+      raw.error ||
+      !raw.data ||
+      raw.data.length !== sponsorAddresses.length * RESULT_LEN
+    ) {
       return false;
     }
 
@@ -163,13 +184,12 @@ export const useSponsors = (sponsorAddresses: string[]) => {
     }
 
     const ret: SponsorInfo[] = []
-    const c = _getContractCalls(zeroAddress)
 
     for (let i = 0; i < sponsorAddresses.length; i++) {
-      const idx = i * c.length
+      const idx = i * RESULT_LEN
       const d = _parseSponsorInfoFromResultArray(
         sponsorAddresses[i]!,
-        raw.data!.slice(idx, idx + c.length),
+        raw.data!.slice(idx, idx + RESULT_LEN),
       );
 
       if (d.owner !== zeroAddress) {

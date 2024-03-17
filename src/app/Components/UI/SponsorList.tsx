@@ -11,7 +11,6 @@ import Link from "next/link";
 const List: FC<{ eventId: number, total: number, sponsors: SponsorInfo[] }> = ({ eventId, total, sponsors }) => {
   const items = useMemo(() => {
     let ret: ReactNode[] = []
-    let itemIndex = 0
 
     for (let i = 0; i < total; i++) {
       if (sponsors[i]) {

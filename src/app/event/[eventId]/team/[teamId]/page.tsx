@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { useCallback, useMemo, useState } from 'react';
+import { formatEther, zeroAddress } from 'viem';
 import { useWriteContract } from 'wagmi';
 import { UpdateTeamNameDialog } from '~/app/Components/Dialogs/UpdateTeamNameDialog';
 import { Button } from '~/app/Components/UI/Button';
@@ -10,15 +11,99 @@ import { LoadEventInfo } from '~/app/Components/UI/LoadEventInfo';
 import { LoadTeamInfo } from '~/app/Components/UI/LoadTeamInfo';
 import { Loading } from '~/app/Components/UI/Loading';
 import { EventInfo } from '~/app/hooks/event';
+import { useSponsor, useSponsorClaimablePrizeByWallet, useSponsorPrizes } from '~/app/hooks/sponsor';
 import { TeamInfo } from '~/app/hooks/team';
+import { useWallet } from '~/app/hooks/wallet';
 import { isEthereumAddress, isSameEthereumAddress } from '~/app/lib/utils';
-import { MASTER_CONTRACT_CONFIG } from '~/contracts';
+import { MASTER_CONTRACT_CONFIG, SPONSOR_CONTRACT_CONFIG } from '~/contracts';
+import { env } from '~/env';
 
 interface Params {
+  eventId: number;
   event: EventInfo;
   teamId: number;
   teamInfo: TeamInfo;
   isTeamLeader: boolean;
+  isTeamMember: boolean;
+}
+
+const ClaimPrize = (params: Params & { sponsorAddress: string }) => {
+  const { teamId, sponsorAddress } = params;
+  const { writeContractAsync } = useWriteContract();
+  const wallet = useWallet();
+
+  const [updating, setUpdating] = useState(false);
+  const [error, setError] = useState();
+
+  const claim = useCallback(async () => {
+    try {
+      setUpdating(true);
+      setError(undefined);
+
+      await writeContractAsync({
+        ...SPONSOR_CONTRACT_CONFIG,
+        address: sponsorAddress as `0x${string}`,
+        functionName: 'claimPrize',
+        args: [BigInt(teamId), env.NEXT_PUBLIC_PAYMENT_TOKEN_CONTRACT as `0x${string}`, wallet!.address as `0x${string}`],
+      });
+    } catch (err: any) {
+      console.error(err);
+      setError(err.message);
+    } finally {
+      setUpdating(false);
+    }
+  }, [writeContractAsync, sponsorAddress, teamId, wallet]);
+
+  return (
+    <div>
+      <Button onClick={claim} disabled={updating}>
+        Claim prize
+      </Button>
+      {updating && <Loading />}
+      {error && <ErrorBox>{`${error}`}</ErrorBox>}
+    </div>
+  );
+}
+
+const SponsorPrize = (params: Params & { sponsorAddress: string }) => {
+  const wallet = useWallet();
+  const { eventId, teamId, sponsorAddress } = params
+
+  const sponsor = useSponsor(sponsorAddress)
+  const sponsorPrize = useSponsorClaimablePrizeByWallet(sponsorAddress, teamId, wallet?.address || zeroAddress)
+
+  const isLoading = useMemo(() => sponsor.isLoading || sponsorPrize.isLoading, [
+    sponsor.isLoading,
+    sponsorPrize.isLoading,
+  ]);
+
+  const error = useMemo(() => sponsor.error || sponsorPrize.error, [
+    sponsor.error,
+    sponsorPrize.error,
+  ]);
+
+  const prize = useMemo(() => (sponsorPrize.data) ? sponsorPrize.data : null, [sponsorPrize.data])
+
+  return (
+    <>
+      {isLoading && <Loading />}
+      {error && <ErrorBox>{`${error}`}</ErrorBox>}
+      {(sponsor.parsedData) && (
+        <div className="rounded-md p-4 mb-4 border border-white">
+          <div className="mb-4">
+            {sponsor.parsedData.name} - <Link href={`/event/${eventId}/sponsor/${sponsorAddress}`}>View</Link>
+          </div>
+          {prize ? (
+            <div>
+              <p className="bg-red text-white">You can claim: {`${formatEther(prize)}`} tokens!!</p>
+              <ClaimPrize {...params} sponsorAddress={sponsorAddress} />
+            </div>
+          ) : <p>Nothing to clam.</p>}
+        </div>
+        
+      )}
+    </>
+  );
 }
 
 const AddMemberForm = ({ teamId, teamInfo }: Params) => {
@@ -140,7 +225,7 @@ const Member = ({
 };
 
 const TeamInfo = (params: Params) => {
-  const { event, teamId, teamInfo, isTeamLeader } = params;
+  const { eventId, event, teamId, teamInfo, isTeamLeader } = params;
   const isTeamInEvent = useMemo(
     () => !!event.teamIds.find((n) => Number(n) === teamId),
     [event.teamIds, teamId],
@@ -168,6 +253,10 @@ const TeamInfo = (params: Params) => {
         ))}
       </ul>
       {isTeamLeader && <AddMemberForm {...params} />}
+      <h2>Prizes to claim:</h2>
+      {event.sponsors.map((sponsorAddress, i) => (
+        <SponsorPrize key={i} {...params} sponsorAddress={sponsorAddress} />
+      ))}
     </div>
   );
 };
@@ -188,12 +277,14 @@ export default function TeamPage({
             <p className="text-sm italic">Event: {ev.name}</p>
           </Link>
           <LoadTeamInfo teamId={teamId}>
-            {(team, isTeamLeader) => (
+            {(team, isTeamLeader, isTeamMember) => (
               <TeamInfo
+                eventId={eventId}
                 event={ev}
                 teamId={teamId}
                 teamInfo={team}
                 isTeamLeader={isTeamLeader}
+                isTeamMember={isTeamMember}
               />
             )}
           </LoadTeamInfo>

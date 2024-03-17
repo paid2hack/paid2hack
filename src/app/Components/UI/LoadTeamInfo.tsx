@@ -8,7 +8,7 @@ import { useWallet } from "~/app/hooks/wallet"
 import { isSameEthereumAddress } from "~/app/lib/utils"
 
 
-export const LoadTeamInfo: FC<{ teamId: number, children: (team: TeamInfo, isTeamLeader: boolean) => any }> = ({ children, teamId }) => {
+export const LoadTeamInfo: FC<{ teamId: number, children: (team: TeamInfo, isTeamLeader: boolean, isTeamMember: boolean) => any }> = ({ children, teamId }) => {
   const wallet = useWallet()
 
   const team = useTeam(teamId)
@@ -16,6 +16,10 @@ export const LoadTeamInfo: FC<{ teamId: number, children: (team: TeamInfo, isTea
   const isTeamLeader = useMemo(() => {
     return !!isSameEthereumAddress(team?.data?.leader, wallet?.address)
   }, [team?.data?.leader, wallet?.address])
+
+  const isTeamMember = useMemo(() => {
+    return isTeamLeader || !!team?.data?.members.find((m) => isSameEthereumAddress(m, wallet?.address))
+  }, [isTeamLeader, team?.data?.members, wallet?.address])
 
   const error = useMemo(() => team.error, [team.error])
 
@@ -29,6 +33,6 @@ export const LoadTeamInfo: FC<{ teamId: number, children: (team: TeamInfo, isTea
     return <Loading />
   }
 
-  return children(team.data!, isTeamLeader)
+  return children(team.data!, isTeamLeader, isTeamMember)
 }
 

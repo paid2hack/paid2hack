@@ -95,3 +95,4 @@ export const useEventTeams = (eventId: number, perPage: number) => {
     parsedData,
   }
 }
+
