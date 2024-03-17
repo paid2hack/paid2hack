@@ -217,9 +217,9 @@ export default function SponsorPage({
               <div>
                 <Link
                   href={`/event/${eventId}`}
-                  className="text-sm italic text-gray-400 hover:text-gray-300"
+                  className="mb-8 block text-sm italic text-[#4c8bf5] hover:text-[#3c74d6]"
                 >
-                  Event: {ev.name}
+                  &larr; Back to Event: {ev.name}
                 </Link>
                 <SponsorInfoWrapper
                   eventId={eventId}
