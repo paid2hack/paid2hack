@@ -16,8 +16,8 @@ export const LoadEventInfo: FC<{ eventId: number, children: (ev: EventInfo, isEv
   const event = useEvent(eventId)
 
   const isEventCreator = useMemo(() => {
-    return !!isSameEthereumAddress(event?.data?.owner, wallet?.address)
-  }, [event?.data?.owner, wallet?.address])
+    return !!isSameEthereumAddress(event?.parsedData?.owner, wallet?.address)
+  }, [event?.parsedData?.owner, wallet?.address])
 
   if (event.error) {
     return <ErrorBox>{`${event.error}`}</ErrorBox>
@@ -27,6 +27,6 @@ export const LoadEventInfo: FC<{ eventId: number, children: (ev: EventInfo, isEv
     return <Loading />
   }
 
-  return children(event.data!, isEventCreator)
+  return children(event.parsedData!, isEventCreator)
 }
 

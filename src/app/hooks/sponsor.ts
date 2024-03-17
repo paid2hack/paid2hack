@@ -13,15 +13,6 @@ export interface SponsorInfo {
 }
 
 
-const _parseSponsorInfoFromResultArray = (address: string, data: any[]) => {
-  return {
-    address,
-    owner: data![0].result as `0x${string}`,
-    name: data![1].result as string,
-    allocatedPrizeMoney: BigInt(data![2].result!),
-    unallocatablePrizeMoney: BigInt(data![3].result!),
-  };
-}
 
 const _getContractCalls = (sponsorAddress: `0x${string}`) => {
   return [
@@ -50,6 +41,16 @@ const _getContractCalls = (sponsorAddress: `0x${string}`) => {
     },
   ];
 }
+
+const _parseSponsorInfoFromResultArray = (address: string, data: any[]) => {
+  return {
+    address,
+    owner: data![0].result as `0x${string}`,
+    name: data![1].result as string,
+    allocatedPrizeMoney: BigInt(data![2].result!),
+    unallocatablePrizeMoney: BigInt(data![3].result!),
+  };
+};
 
 export const useSponsor = (sponsorAddress: string) => {
   const address = sponsorAddress as `0x${string}`;

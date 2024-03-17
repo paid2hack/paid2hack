@@ -98,7 +98,7 @@ const SponsorPrize = (params: Params & { sponsorAddress: string }) => {
               <p className="bg-red text-white">You can claim: {`${formatEther(prize)}`} tokens!!</p>
               <ClaimPrize {...params} sponsorAddress={sponsorAddress} />
             </div>
-          ) : <p>Nothing to clam.</p>}
+          ) : <p>You have nothing to clam.</p>}
         </div>
         
       )}

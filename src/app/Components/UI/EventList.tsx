@@ -6,6 +6,7 @@ import { ErrorBox } from './ErrorBox';
 import Link from 'next/link';
 import { EventInfo, useEvents, useTotalEvents } from '~/app/hooks/event';
 import { Card, CardHeader, CardTitle } from './card';
+import { formatEther } from 'viem';
 
 const PER_PAGE = 10;
 
@@ -16,7 +17,7 @@ const List: FC<{ total: number; events: EventInfo[] }> = ({ total, events }) => 
 
     for (let i = 0; i < total; i++ ) {
       if (events[i]) {
-        const { name } = events[i]!
+        const { name, totalPrizeMoney } = events[i]!
         const capitalized = name.charAt(0).toUpperCase() + name.slice(1);
         ret.push(
           <li className="" key={tokenId++}>
@@ -27,7 +28,7 @@ const List: FC<{ total: number; events: EventInfo[] }> = ({ total, events }) => 
               >
                 <CardHeader className="ml-4  p-2">
                   <CardTitle className="grid grid-cols-3  text-sm ">
-                    <div>{capitalized}</div> <div>$250,000</div>{' '}
+                    <div>{capitalized}</div> <div>{formatEther(totalPrizeMoney)} tokens</div>{' '}
                     <div className="flex w-full items-end justify-end">
                       <div className="w-20 rounded-lg border-2 border-green-900 bg-green-950/40 px-4 text-sm  text-slate-300">
                         Verified
