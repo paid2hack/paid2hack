@@ -196,7 +196,7 @@ const SponsorInfoWrapper = (params: Params) => {
   if (!isSponsorForEvent) {
     return <ErrorBox>Sponsor not found for event</ErrorBox>;
   } else {
-    return <SponsorInfo {...params} />;
+    return <SponsorInfoInner {...params} />;
   }
 };
 

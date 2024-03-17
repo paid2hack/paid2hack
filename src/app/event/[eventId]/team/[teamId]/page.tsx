@@ -261,7 +261,7 @@ const Member = ({
           >
             Remove
           </Button>
-          {updating && <Loading className="ml-2" />}
+          {updating && <Loading />}
         </div>
       )}
       {error && (
