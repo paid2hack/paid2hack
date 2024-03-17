@@ -9,6 +9,7 @@ import { ErrorBox } from '../UI/ErrorBox';
 import { LoadEventInfo } from '../UI/LoadEventInfo';
 import { ActionDialog, CloseDialogCallback } from './ActionDialog';
 import { TeamForm, teamFormSchema } from './CreateTeamForm';
+
 export const CreateTeamDialog: FC<PropsWithChildren<{ eventId: number }>> = ({
   eventId,
   children,
