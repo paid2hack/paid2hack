@@ -18,21 +18,6 @@ import { isSameEthereumAddress } from '~/app/lib/utils';
 import { PAYMENT_TOKEN_CONTRACT_CONFIG, SPONSOR_CONTRACT_CONFIG } from '~/contracts';
 import { env } from '~/env';
 
-import { zodResolver } from '@hookform/resolvers/zod';
-import { useForm } from 'react-hook-form';
-import { z } from 'zod';
-
-import {
-  Form,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from '~/app/Components/UI/Form/form';
-import { Input } from '~/app/Components/UI/Form/input';
-
 interface Params {
   eventId: number;
   event: EventInfo;
@@ -130,18 +115,24 @@ const AddFunds = (params: Params) => {
 
   const { writeContractAsync } = useWriteContract();
 
+  const [ amount, setAmount] = useState<string>('0');
   const [updating, setUpdating] = useState(false);
   const [error, setError] = useState();
 
-  const addFunds = useCallback(async (data: z.infer<typeof allocatePrizeFormSchema>) => { 
+  const onChange = useCallback((e: any) => {
+    setAmount(e.target.value);
+  }, []);
+
+  const addFunds = useCallback(async (e: any) => { 
     try {
+      e.preventDefault()
       setUpdating(true);
       setError(undefined);
 
       await writeContractAsync({
         ...PAYMENT_TOKEN_CONTRACT_CONFIG,
         functionName: 'transfer',
-        args: [sponsorAddress as `0x${string}`, BigInt(data.amount)],
+        args: [sponsorAddress as `0x${string}`, BigInt(parseEther(amount))],
       });
     } catch (err: any) {
       console.error(err);
@@ -149,12 +140,16 @@ const AddFunds = (params: Params) => {
     } finally {
       setUpdating(false);
     }
-  }, [sponsorAddress, writeContractAsync]);
+  }, [amount, sponsorAddress, writeContractAsync]);
 
   return (
-    <div>
+    <div className="mx-4">
       <h2 className="mb-4 text-xl text-gray-300">Add funds</h2>
-      <AddFundsForm onSubmit={addFunds} />
+      <form className="flex flex-col" onSubmit={addFunds}>
+        <input className="text-black mb-4" type="text" placeholder="Event name" onChange={onChange} value={amount} size={30} />
+        <Button className="mb-2" type="submit">Add funds</Button>
+        {error ? <ErrorBox>{error}</ErrorBox> : null}
+      </form>
       {error ? <ErrorBox>{error}</ErrorBox> : null}
       {updating && <Loading />}
     </div>
@@ -182,6 +177,11 @@ const SponsorInfoInner = (params: Params) => {
   const allocatedPrizeMoney = useMemo(
     () => sponsor.parsedData?.allocatedPrizeMoney,
     [sponsor.parsedData?.allocatedPrizeMoney],
+  );
+
+  const unallocatedPrizeMoney = useMemo(
+    () => sponsor.parsedData?.unallocatablePrizeMoney,
+    [sponsor.parsedData?.unallocatablePrizeMoney],
   );
 
   const teamPrizes = useMemo(() => {
@@ -221,7 +221,7 @@ const SponsorInfoInner = (params: Params) => {
       <h1 className="mb-4 text-2xl font-bold text-gray-100">Name: {name}</h1>
       <AddFunds {...params} />
       <h2 className="mb-4 text-xl text-gray-300">
-        Total prize money: {formatEther(allocatedPrizeMoney || 0n)}
+        Allocated / total prize money: {formatEther(allocatedPrizeMoney || 0n)} / {formatEther(unallocatedPrizeMoney || 0n)}
       </h2>
       {isSponsorOwner && (
         <UpdateSponsorNameDialog sponsorAddress={sponsorAddress}>
@@ -290,54 +290,3 @@ export default function SponsorPage({
 }
 
 
-export const allocatePrizeFormSchema = z.object({
-  amount: z.number().min(1, {
-    message: 'Prize amount must be at least 1 token.',
-  }),
-});
-
-export function AddFundsForm({
-  onSubmit,
-}: {
-  onSubmit: (data: z.infer<typeof allocatePrizeFormSchema>) => void;
-}) {
-  // 1. Define your form.
-  const form = useForm<z.infer<typeof allocatePrizeFormSchema>>({
-    resolver: zodResolver(allocatePrizeFormSchema),
-    defaultValues: {
-      amount: 0,
-    },
-  });
-
-  return (
-    <Form {...form}>
-      <form
-        onSubmit={form.handleSubmit((data) => onSubmit(data))}
-        className="space-y-8"
-      >
-        <FormField
-          control={form.control}
-          name="amount"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Funding Amount</FormLabel>
-              <FormControl>
-                <Input
-                  type="string"
-                  placeholder="Enter the funding amount"
-                  {...field}
-                />
-              </FormControl>
-              <FormDescription>
-                Specify the number of tokens to add as funds.
-              </FormDescription>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        <Button type="submit">Add funds</Button>
-      </form>
-    </Form>
-  );
-}
