@@ -1,3 +1,5 @@
+[![ci](https://github.com/paid2hack/paid2hack/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/paid2hack/paid2hack/actions/workflows/ci.yml)
+
 # Paid2Hack
 
 _Incubated at [ETHGlobal London 2024](https://ethglobal.com/events/london2024)._
