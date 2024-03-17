@@ -3,7 +3,6 @@
 import {
   FC,
   PropsWithChildren,
-  ReactNode,
   useCallback,
   useMemo,
   useState,
@@ -11,9 +10,10 @@ import {
 import { ActionDialog, CloseDialogCallback } from './ActionDialog';
 import { useWriteContract } from 'wagmi';
 import { MASTER_CONTRACT_CONFIG } from '~/contracts';
-import { Button } from '../UI/Button';
+import { Button } from '../UI/button';
 import { ErrorBox } from '../UI/ErrorBox';
-import { LoadTeamInfo, TeamInfo } from '../UI/LoadTeamInfo';
+import { LoadTeamInfo } from '../UI/LoadTeamInfo';
+import { TeamInfo } from '~/app/hooks/team';
 
 const Form: FC<{
   id: number;

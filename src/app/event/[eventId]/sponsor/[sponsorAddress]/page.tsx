@@ -4,7 +4,7 @@ import Link from "next/link"
 import { ReactNode, useCallback, useMemo, useState } from "react"
 import { formatEther, parseEther } from "viem"
 import { useWriteContract } from "wagmi"
-import { Button } from "~/app/Components/UI/Button"
+import { Button } from "~/app/Components/UI/button"
 import { ErrorBox } from "~/app/Components/UI/ErrorBox"
 import { LoadEventInfo } from "~/app/Components/UI/LoadEventInfo"
 import { LoadSponsorInfo } from "~/app/Components/UI/LoadSponsorInfo"
@@ -84,7 +84,7 @@ const AllocateForm = (params: Params) => {
   )
 }
 
-const SponsorInfo = (params: Params) => {
+const SponsorInfoInner = (params: Params) => {
   const { event, sponsorAddress, isSponsorOwner } = params
   const sponsor = useSponsor(sponsorAddress)
   const prizes = useSponsorPrizes(sponsorAddress, event.teamIds as bigint[])
@@ -151,7 +151,7 @@ const SponsorInfoWrapper = (params: Params) => {
   if (!isSponsorForEvent) {
     return <ErrorBox>Sponsor not found for event</ErrorBox>
   } else {
-    return <SponsorInfo {...params} />
+    return <SponsorInfoInner {...params} />
   }
 }
 

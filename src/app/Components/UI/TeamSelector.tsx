@@ -4,9 +4,8 @@ import { FC, useState, useEffect, useCallback, useMemo } from "react"
 import { useEventTeams } from "~/app/hooks/team"
 import { ErrorBox } from "./ErrorBox"
 import { Loading } from "./Loading"
-import { EventInfo } from "./LoadEventInfo"
 import { cn } from "~/app/lib/utils"
-import { Button } from "~/app/Components/UI/Button"
+import { Button } from "~/app/Components/UI/button"
 import {
   Command,
   CommandEmpty,
@@ -21,6 +20,7 @@ import {
   PopoverTrigger,
 } from "~/app/Components/UI/Popover"
 import { Check, ChevronsUpDown } from "lucide-react"
+import { EventInfo } from "~/app/hooks/event"
 
 export const TeamSelector: FC<{ onSelect: (teamId: number) => void, event: EventInfo, eventId: number }> = (params) => {
   const { eventId, event, onSelect } = params

@@ -3,7 +3,7 @@ import { cn } from '~/app/lib/utils';
 import { motion, useAnimation } from 'framer-motion';
 import React, { useEffect } from 'react';
 import { Lock, Unlock, Wand } from 'lucide-react';
-import { Button } from './Button';
+import { Button } from './button';
 import { CreateEventDialog } from '../Dialogs/CreateEventDialog';
 
 const transition = {

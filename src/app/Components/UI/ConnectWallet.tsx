@@ -4,7 +4,7 @@
 import { ConnectButton, DisclaimerComponent } from '@rainbow-me/rainbowkit'
 import { PropsWithClassName } from '~/app/lib/utils';
 import { FC } from 'react';
-import { Button } from './Button';
+import { Button } from './button';
 
 export const Disclaimer: DisclaimerComponent = ({ Text, Link }) => (
   <Text>

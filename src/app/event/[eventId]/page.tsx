@@ -1,6 +1,6 @@
 'use client';
 
-import { Button } from '~/app/Components/UI/Button';
+import { Button } from '~/app/Components/UI/button';
 import { CreateTeamDialog } from '~/app/Components/Dialogs/CreateTeamDialog';
 
 import { IfWalletConnected } from '~/app/Components/UI/IfWalletConnected';

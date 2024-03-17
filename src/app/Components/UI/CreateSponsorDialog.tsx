@@ -4,11 +4,12 @@ import { FC, PropsWithChildren, useCallback, useMemo, useState } from "react";
 import { ActionDialog, CloseDialogCallback } from "~/app/Components/Dialogs/ActionDialog";
 import { usePublicClient, useWriteContract } from "wagmi";
 import { MASTER_CONTRACT_CONFIG, SPONSOR_CONTRACT_BYTECODE, SPONSOR_CONTRACT_CONFIG } from "~/contracts";
-import { Button } from "./Button";
+import { Button } from "./button";
 import { ErrorBox } from "./ErrorBox";
-import { EventInfo, LoadEventInfo } from "./LoadEventInfo";
+import { LoadEventInfo } from "./LoadEventInfo";
 import { useWallet } from "~/app/hooks/wallet";
 import { useRouter } from "next/navigation";
+import { EventInfo } from "~/app/hooks/event";
 
 const Form: FC<{ id: number, info: EventInfo, closeDialog: CloseDialogCallback }> = ({ id, info, closeDialog }) => {
   const router = useRouter()

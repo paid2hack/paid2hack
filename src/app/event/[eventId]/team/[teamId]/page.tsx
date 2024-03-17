@@ -5,7 +5,7 @@ import { useCallback, useMemo, useState } from 'react';
 import { formatEther, zeroAddress } from 'viem';
 import { useWriteContract } from 'wagmi';
 import { UpdateTeamNameDialog } from '~/app/Components/Dialogs/UpdateTeamNameDialog';
-import { Button } from '~/app/Components/UI/Button';
+import { Button } from '~/app/Components/UI/button';
 import { ErrorBox } from '~/app/Components/UI/ErrorBox';
 import { LoadEventInfo } from '~/app/Components/UI/LoadEventInfo';
 import { LoadTeamInfo } from '~/app/Components/UI/LoadTeamInfo';
@@ -224,7 +224,7 @@ const Member = ({
   );
 };
 
-const TeamInfo = (params: Params) => {
+const TeamInfoInner = (params: Params) => {
   const { eventId, event, teamId, teamInfo, isTeamLeader } = params;
   const isTeamInEvent = useMemo(
     () => !!event.teamIds.find((n) => Number(n) === teamId),
@@ -278,7 +278,7 @@ export default function TeamPage({
           </Link>
           <LoadTeamInfo teamId={teamId}>
             {(team, isTeamLeader, isTeamMember) => (
-              <TeamInfo
+              <TeamInfoInner
                 eventId={eventId}
                 event={ev}
                 teamId={teamId}

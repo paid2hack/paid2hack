@@ -4,10 +4,11 @@ import { FC, PropsWithChildren, useCallback, useMemo, useState } from 'react';
 import { ActionDialog, CloseDialogCallback } from './ActionDialog';
 import { useWriteContract } from 'wagmi';
 import { MASTER_CONTRACT_CONFIG } from '~/contracts';
-import { Button } from '../UI/Button';
+import { Button } from '../UI/button';
 import { ErrorBox } from '../UI/ErrorBox';
-import { EventInfo, LoadEventInfo } from '../UI/LoadEventInfo';
+import { LoadEventInfo } from '../UI/LoadEventInfo';
 import { useWallet } from '~/app/hooks/wallet';
+import { EventInfo } from '~/app/hooks/event';
 
 const Form: FC<{
   id: number;

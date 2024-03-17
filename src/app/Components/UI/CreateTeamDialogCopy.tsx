@@ -1,13 +1,14 @@
 "use client"
 
 import { FC, PropsWithChildren, ReactNode, useCallback, useMemo, useState } from "react";
-import { ActionDialog, CloseDialogCallback } from "./ActionDialog";
 import { useWriteContract } from "wagmi";
 import { MASTER_CONTRACT_CONFIG } from "~/contracts";
-import { Button } from "./Button";
+import { Button } from "./button";
 import { ErrorBox } from "./ErrorBox";
-import { EventInfo, LoadEventInfo } from "./LoadEventInfo";
+import { LoadEventInfo } from "./LoadEventInfo";
 import { useWallet } from "~/app/hooks/wallet";
+import { EventInfo } from "~/app/hooks/event";
+import { ActionDialog, CloseDialogCallback } from "../Dialogs/ActionDialog";
 
 const Form: FC<{ id: number, info: EventInfo, closeDialog: CloseDialogCallback }> = ({ id, info, closeDialog }) => {
   const wallet = useWallet()

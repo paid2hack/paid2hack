@@ -4,7 +4,7 @@ import { FC, PropsWithChildren, useCallback, useMemo, useState } from "react";
 import { ActionDialog, CloseDialogCallback } from "~/app/Components/Dialogs/ActionDialog";
 import { useWriteContract } from "wagmi";
 import { SPONSOR_CONTRACT_CONFIG } from "~/contracts";
-import { Button } from "./Button";
+import { Button } from "./button";
 import { ErrorBox } from "./ErrorBox";
 import { LoadSponsorInfo } from "./LoadSponsorInfo";
 import { SponsorInfo } from "~/app/hooks/sponsor";
