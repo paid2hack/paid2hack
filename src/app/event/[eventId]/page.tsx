@@ -13,7 +13,7 @@ import {
   TabsContent,
   TabsList,
   TabsTrigger,
-} from '~/app/Components/UI/tabs';
+} from '~/app/Components/UI/Tabs';
 import { Separator } from '~/app/Components/UI/separator';
 
 export default function EventPage({ params }: { params: { eventId: number } }) {
