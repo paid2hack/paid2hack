@@ -1,22 +1,31 @@
 "use client"
 
 import Link from "next/link"
-import { ReactNode, useCallback, useEffect, useMemo, useState } from "react"
-import { formatEther } from "viem"
+import { ReactNode, useCallback, useMemo, useState } from "react"
+import { formatEther, parseEther } from "viem"
+import { useWriteContract } from "wagmi"
 import { Button } from "~/app/Components/UI/Button"
 import { ErrorBox } from "~/app/Components/UI/ErrorBox"
-import { EventInfo, LoadEventInfo } from "~/app/Components/UI/LoadEventInfo"
+import { LoadEventInfo } from "~/app/Components/UI/LoadEventInfo"
 import { LoadSponsorInfo } from "~/app/Components/UI/LoadSponsorInfo"
 import { LoadTeamInfo } from "~/app/Components/UI/LoadTeamInfo"
 import { Loading } from "~/app/Components/UI/Loading"
 import { TeamSelector } from "~/app/Components/UI/TeamSelector"
 import { UpdateSponsorNameDialog } from "~/app/Components/UI/UpdateSponsorNameDialog"
+import { EventInfo } from "~/app/hooks/event"
 import { SponsorInfo, useSponsor, useSponsorPrizes } from "~/app/hooks/sponsor"
 import { isSameEthereumAddress } from "~/app/lib/utils"
+import { SPONSOR_CONTRACT_CONFIG } from "~/contracts"
+import { env } from "~/env"
 
 interface Params { eventId: number, event: EventInfo, sponsorAddress: string, sponsor: SponsorInfo, isSponsorOwner: boolean }
 
 const AllocateForm = (params: Params) => {
+  const { writeContractAsync } = useWriteContract()
+  
+  const { sponsor, sponsorAddress } = params
+
+  const [amount, setAmount] = useState<string>("0")
   const [team, setTeam] = useState<number>()
   const [updating, setUpdating] = useState(false)
   const [error, setError] = useState()
@@ -25,9 +34,18 @@ const AllocateForm = (params: Params) => {
     setTeam(teamId)
   }, [])
 
+  const onSetAmount = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    setAmount(e.target.value)
+  }, [])
+
   const canSubmit = useMemo(() => {
-    return !updating && team
-  }, [team, updating])
+    return !updating 
+      && team 
+      && amount 
+      && amount !== "0" 
+      && !isNaN(Number(amount)) 
+      && parseEther(amount) <= sponsor.unallocatablePrizeMoney
+  }, [amount, sponsor.unallocatablePrizeMoney, team, updating])
 
   const onSubmit = useCallback(async (e: React.FormEvent<HTMLFormElement>) => {
     try {
@@ -35,19 +53,30 @@ const AllocateForm = (params: Params) => {
 
       setUpdating(true)
       setError(undefined)
+
+      await writeContractAsync({
+        ...SPONSOR_CONTRACT_CONFIG,
+        address: sponsorAddress as `0x${string}`,
+        functionName: 'allocatePrizes',
+        args: [ [env.NEXT_PUBLIC_PAYMENT_TOKEN_CONTRACT as `0x${string}`], [BigInt(team!)], [parseEther(amount!)] ]
+      })
     } catch (err: any) {
       console.error(err)
       setError(err.message)
     } finally {
       setUpdating(false)
     }
-  }, [])
+  }, [amount, sponsorAddress, team, writeContractAsync])
 
   return (
     <form className="mt-6" onSubmit={onSubmit}>
       <h2>Allocate prize:</h2>
-      <div>
+      <div className="my-2">
         <TeamSelector {...params} onSelect={onTeamSelect} />
+      </div>
+      <div className="my-2">
+        <label>Prize amount - ({formatEther(sponsor.unallocatablePrizeMoney)} tokens available):</label>
+        <input className="text-black" type="text" required disabled={updating} onChange={onSetAmount} />
       </div>
       <Button className="mb-2" type="submit" disabled={!canSubmit}>Submit</Button>
       {error ? <ErrorBox>{error}</ErrorBox> : null}
@@ -64,7 +93,7 @@ const SponsorInfo = (params: Params) => {
   const error = useMemo(() => sponsor.error || prizes.error, [sponsor.error, prizes.error])
 
   const name = useMemo(() => sponsor.parsedData?.name, [sponsor.parsedData?.name])
-  const totalPrizeMoney = useMemo(() => sponsor.parsedData?.totalPrizeMoney, [sponsor.parsedData?.totalPrizeMoney])
+  const allocatedPrizeMoney = useMemo(() => sponsor.parsedData?.allocatedPrizeMoney, [sponsor.parsedData?.allocatedPrizeMoney])
 
   const teamPrizes = useMemo(() => {
     const ret: ReactNode[] = []
@@ -98,7 +127,7 @@ const SponsorInfo = (params: Params) => {
   return (
     <div>
       <h1>Name: {name}</h1>
-      <h2>Total prize money: {formatEther(totalPrizeMoney || 0n)}</h2>
+      <h2>Total prize money: {formatEther(allocatedPrizeMoney || 0n)}</h2>
       {isSponsorOwner && (
         <UpdateSponsorNameDialog sponsorAddress={sponsorAddress}>
           <Button className="mb-2">Update sponsor name</Button>

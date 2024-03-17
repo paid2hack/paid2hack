@@ -5,10 +5,11 @@ import { DEFAULT_CONTRACT_QUERY_OPTIONS, SPONSOR_CONTRACT_CONFIG } from "~/contr
 import { env } from "~/env";
 
 export interface SponsorInfo {
-  address: string
-  name: string
-  totalPrizeMoney: bigint
-  owner: string
+  address: string;
+  owner: string;
+  name: string;
+  allocatedPrizeMoney: bigint;
+  unallocatablePrizeMoney: bigint;
 }
 
 export interface TeamPrizeInfo {
@@ -20,35 +21,46 @@ export interface TeamPrizeInfo {
 const _parseSponsorInfoFromResultArray = (address: string, data: any[]) => {
   return {
     address,
-    name: data![0].result as string,
-    totalPrizeMoney: BigInt(data![1].result!),
-    owner: data![2].result as `0x${string}`,
-  }
+    owner: data![0].result as `0x${string}`,
+    name: data![1].result as string,
+    allocatedPrizeMoney: BigInt(data![2].result!),
+    unallocatablePrizeMoney: BigInt(data![3].result!),
+  };
+}
+
+const _getContractCalls = (sponsorAddress: `0x${string}`) => {
+  return [
+    {
+      ...SPONSOR_CONTRACT_CONFIG,
+      address: sponsorAddress,
+      functionName: "owner",
+      args: [],
+    },
+    {
+      ...SPONSOR_CONTRACT_CONFIG,
+      address: sponsorAddress,
+      functionName: "name",
+    },
+    {
+      ...SPONSOR_CONTRACT_CONFIG,
+      address: sponsorAddress,
+      functionName: "totalTokenPrizeAmounts",
+      args: [env.NEXT_PUBLIC_PAYMENT_TOKEN_CONTRACT as `0x${string}`],
+    },
+    {
+      ...SPONSOR_CONTRACT_CONFIG,
+      address: sponsorAddress,
+      functionName: "getAllocatablePrize",
+      args: [env.NEXT_PUBLIC_PAYMENT_TOKEN_CONTRACT as `0x${string}`],
+    },
+  ];
 }
 
 export const useSponsor = (sponsorAddress: string) => {
   const address = sponsorAddress as `0x${string}`;
 
   const raw = useReadContracts({
-    contracts: [
-      {
-        ...SPONSOR_CONTRACT_CONFIG,
-        address,
-        functionName: "name",
-      },
-      {
-        ...SPONSOR_CONTRACT_CONFIG,
-        address,
-        functionName: "totalTokenPrizeAmounts",
-        args: [env.NEXT_PUBLIC_PAYMENT_TOKEN_CONTRACT as `0x${string}`],
-      },
-      {
-        ...SPONSOR_CONTRACT_CONFIG,
-        address,
-        functionName: "owner",
-        args: [],
-      },
-    ],
+    contracts: _getContractCalls(address),
     query: {
       ...DEFAULT_CONTRACT_QUERY_OPTIONS,
     },
@@ -129,31 +141,7 @@ export const useSponsorPrizes = (sponsorAddress: string, teamIds: bigint[]) => {
 
 export const useSponsors = (sponsorAddresses: string[]) => {
   const raw = useReadContracts({
-    contracts: sponsorAddresses
-      .map((a) => {
-        const address = a as `0x${string}`;
-
-        return [
-          {
-            ...SPONSOR_CONTRACT_CONFIG,
-            address,
-            functionName: "name",
-          },
-          {
-            ...SPONSOR_CONTRACT_CONFIG,
-            address,
-            functionName: "totalTokenPrizeAmounts",
-            args: [env.NEXT_PUBLIC_PAYMENT_TOKEN_CONTRACT],
-          },
-          {
-            ...SPONSOR_CONTRACT_CONFIG,
-            address,
-            functionName: "owner",
-            args: [],
-          },
-        ];
-      })
-      .flat(),
+    contracts: sponsorAddresses.map((a) => _getContractCalls(a as `0x${string}`)).flat(),
     query: {
       ...DEFAULT_CONTRACT_QUERY_OPTIONS,
     },
@@ -175,11 +163,13 @@ export const useSponsors = (sponsorAddresses: string[]) => {
     }
 
     const ret: SponsorInfo[] = []
+    const c = _getContractCalls(zeroAddress)
 
     for (let i = 0; i < sponsorAddresses.length; i++) {
+      const idx = i * c.length
       const d = _parseSponsorInfoFromResultArray(
         sponsorAddresses[i]!,
-        raw.data!.slice(i * 3, i * 3 + 3),
+        raw.data!.slice(idx, idx + c.length),
       );
 
       if (d.owner !== zeroAddress) {
