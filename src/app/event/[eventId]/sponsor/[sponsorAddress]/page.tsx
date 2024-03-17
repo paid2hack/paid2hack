@@ -4,7 +4,6 @@ import Link from 'next/link';
 import { ReactNode, useCallback, useMemo, useState } from 'react';
 import { formatEther, parseEther } from 'viem';
 import { useWriteContract } from 'wagmi';
-import { Button } from '~/app/Components/UI/button';
 import { ErrorBox } from '~/app/Components/UI/ErrorBox';
 import { LoadEventInfo } from '~/app/Components/UI/LoadEventInfo';
 import { LoadSponsorInfo } from '~/app/Components/UI/LoadSponsorInfo';
@@ -12,11 +11,27 @@ import { LoadTeamInfo } from '~/app/Components/UI/LoadTeamInfo';
 import { Loading } from '~/app/Components/UI/Loading';
 import { TeamSelector } from '~/app/Components/UI/TeamSelector';
 import { UpdateSponsorNameDialog } from '~/app/Components/UI/UpdateSponsorNameDialog';
+import { Button } from '~/app/Components/UI/button';
 import { EventInfo } from '~/app/hooks/event';
 import { SponsorInfo, useSponsor, useSponsorPrizes } from '~/app/hooks/sponsor';
 import { isSameEthereumAddress } from '~/app/lib/utils';
-import { SPONSOR_CONTRACT_CONFIG } from '~/contracts';
+import { PAYMENT_TOKEN_CONTRACT_CONFIG, SPONSOR_CONTRACT_CONFIG } from '~/contracts';
 import { env } from '~/env';
+
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useForm } from 'react-hook-form';
+import { z } from 'zod';
+
+import {
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '~/app/Components/UI/Form/form';
+import { Input } from '~/app/Components/UI/Form/input';
 
 interface Params {
   eventId: number;
@@ -110,6 +125,42 @@ const AllocateForm = (params: Params) => {
   );
 };
 
+const AddFunds = (params: Params) => {
+  const { sponsorAddress } = params; 
+
+  const { writeContractAsync } = useWriteContract();
+
+  const [updating, setUpdating] = useState(false);
+  const [error, setError] = useState();
+
+  const addFunds = useCallback(async (data: z.infer<typeof allocatePrizeFormSchema>) => { 
+    try {
+      setUpdating(true);
+      setError(undefined);
+
+      await writeContractAsync({
+        ...PAYMENT_TOKEN_CONTRACT_CONFIG,
+        functionName: 'transfer',
+        args: [sponsorAddress as `0x${string}`, BigInt(data.amount)],
+      });
+    } catch (err: any) {
+      console.error(err);
+      setError(err.message);
+    } finally {
+      setUpdating(false);
+    }
+  }, [sponsorAddress, writeContractAsync]);
+
+  return (
+    <div>
+      <h2 className="mb-4 text-xl text-gray-300">Add funds</h2>
+      <AddFundsForm onSubmit={addFunds} />
+      {error ? <ErrorBox>{error}</ErrorBox> : null}
+      {updating && <Loading />}
+    </div>
+  )
+}
+
 const SponsorInfoInner = (params: Params) => {
   const { event, sponsorAddress, isSponsorOwner } = params;
   const sponsor = useSponsor(sponsorAddress);
@@ -168,6 +219,7 @@ const SponsorInfoInner = (params: Params) => {
   return (
     <div className="rounded-lg bg-gray-900 p-6 shadow-md">
       <h1 className="mb-4 text-2xl font-bold text-gray-100">Name: {name}</h1>
+      <AddFunds {...params} />
       <h2 className="mb-4 text-xl text-gray-300">
         Total prize money: {formatEther(allocatedPrizeMoney || 0n)}
       </h2>
@@ -237,20 +289,6 @@ export default function SponsorPage({
   );
 }
 
-import { zodResolver } from '@hookform/resolvers/zod';
-import { useForm } from 'react-hook-form';
-import { z } from 'zod';
-
-import {
-  Form,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from '~/app/Components/UI/Form/form';
-import { Input } from '~/app/Components/UI/Form/input';
 
 export const allocatePrizeFormSchema = z.object({
   amount: z.number().min(1, {
@@ -258,7 +296,7 @@ export const allocatePrizeFormSchema = z.object({
   }),
 });
 
-export function AllocatePrizeForm({
+export function AddFundsForm({
   onSubmit,
 }: {
   onSubmit: (data: z.infer<typeof allocatePrizeFormSchema>) => void;
@@ -282,23 +320,23 @@ export function AllocatePrizeForm({
           name="amount"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Prize Amount</FormLabel>
+              <FormLabel>Funding Amount</FormLabel>
               <FormControl>
                 <Input
-                  type="number"
-                  placeholder="Enter the prize amount"
+                  type="string"
+                  placeholder="Enter the funding amount"
                   {...field}
                 />
               </FormControl>
               <FormDescription>
-                Specify the number of tokens to allocate as a prize.
+                Specify the number of tokens to add as funds.
               </FormDescription>
               <FormMessage />
             </FormItem>
           )}
         />
 
-        <Button type="submit">Allocate Prize</Button>
+        <Button type="submit">Add funds</Button>
       </form>
     </Form>
   );
