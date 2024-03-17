@@ -95,7 +95,7 @@ const EventCard = ({
     <Card className="hover:shadow-slate-650 mx-4 my-4 border-2 border-slate-700 bg-slate-800 px-2 shadow-sm shadow-slate-700 transition-all duration-100 ease-in-out hover:border-2 hover:bg-slate-700 hover:shadow-md">
       <CardHeader className="ml-4 p-2">
         <CardTitle className="grid grid-cols-3 text-sm text-slate-200">
-          <div>{capitalized}</div> {console.log(prizeMoney)}
+          <div>{capitalized}</div>
           <div className="text-center">{prizeMoney} tokens</div>{' '}
           <div className="flex items-end justify-end">
             <div className="w-20 rounded-lg border-2 border-green-600 bg-green-800 px-4 text-sm text-green-200">
