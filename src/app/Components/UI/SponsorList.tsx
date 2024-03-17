@@ -52,8 +52,7 @@ const SponsorListInner: FC<{
   const sponsors = useSponsors(sponsorAddresses as string[]);
   const error = useMemo(() => sponsors.error, [sponsors.error]);
   const isLoading = useMemo(() => sponsors.isLoading, [sponsors.isLoading]);
-  console.log('sponsorAddresses', sponsorAddresses);
-  console.log('sponsors', sponsors);
+
   return (
     <>
       <h2 className="mb-6 text-2xl font-bold text-gray-100">Sponsor List</h2>

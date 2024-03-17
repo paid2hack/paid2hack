@@ -29,11 +29,9 @@ export const CreateEventDialog: FC<PropsWithChildren> = ({ children }) => {
       data: z.infer<typeof eventFormSchema>,
       closeDialog: CloseDialogCallback,
     ) => {
-      console.log('data', data);
       if (creating) {
         return;
       }
-      console.log('MASTER_CONTRACT_CONFIG', MASTER_CONTRACT_CONFIG);
       try {
         setCreating(true);
 

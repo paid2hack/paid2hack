@@ -24,11 +24,9 @@ export const CreateTeamDialog: FC<PropsWithChildren<{ eventId: number }>> = ({
       data: z.infer<typeof teamFormSchema>,
       closeDialog: CloseDialogCallback,
     ) => {
-      console.log('data', data);
       if (creating) {
         return;
       }
-      console.log('MASTER_CONTRACT_CONFIG', MASTER_CONTRACT_CONFIG);
       try {
         setCreating(true);
         await writeContractAsync({
