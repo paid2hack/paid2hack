@@ -44,13 +44,13 @@ const List: FC<{ total: number; events: EventInfo[] }> = ({
   }, [events, total]);
 
   return (
-    <div className="mx-4 my-6 flex-col border-2 border-[#076EFF]/60 bg-black shadow-lg shadow-[#076EFF]/40 ">
-      <Card className="shadow-slate-lg rounded-b-none border-b-4 border-b-slate-700 bg-black px-2 shadow-lg">
-        <CardHeader className="">
-          <CardTitle>Upcoming events</CardTitle>
+    <div className="mx-4 my-6 flex-col overflow-hidden rounded-lg border border-gray-800 bg-gray-900 shadow-md">
+      <Card className="rounded-none border-b border-gray-800 bg-gray-900 px-2">
+        <CardHeader>
+          <CardTitle className="text-gray-100">Upcoming events</CardTitle>
         </CardHeader>
       </Card>
-      <ul className="">{items}</ul>
+      <ul className="divide-y divide-gray-800">{items}</ul>
     </div>
   );
 };

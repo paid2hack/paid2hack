@@ -1,64 +1,48 @@
 'use client';
 
-import { FC, PropsWithChildren, useCallback, useMemo, useState } from 'react';
-import { ActionDialog, CloseDialogCallback } from './ActionDialog';
+import { FC, PropsWithChildren, useCallback, useState } from 'react';
 import { useWriteContract } from 'wagmi';
+import { z } from 'zod';
+import { useWallet } from '~/app/hooks/wallet';
 import { MASTER_CONTRACT_CONFIG } from '~/contracts';
-import { Button } from '../UI/button';
 import { ErrorBox } from '../UI/ErrorBox';
 import { LoadEventInfo } from '../UI/LoadEventInfo';
-import { useWallet } from '~/app/hooks/wallet';
-import { EventInfo } from '~/app/hooks/event';
-
-const Form: FC<{
-  id: number;
-  info: EventInfo;
-  closeDialog: CloseDialogCallback;
-}> = ({ id, info, closeDialog }) => {
+import { ActionDialog, CloseDialogCallback } from './ActionDialog';
+import { TeamForm, teamFormSchema } from './CreateTeamForm';
+export const CreateTeamDialog: FC<PropsWithChildren<{ eventId: number }>> = ({
+  eventId,
+  children,
+}) => {
   const wallet = useWallet();
   const { writeContractAsync } = useWriteContract();
-
-  const [name, setName] = useState('');
   const [creating, setCreating] = useState(false);
   const [error, setError] = useState('');
 
-  // TODO: input team member addresses
-
-  const onNameChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    setName(e.target.value);
-  }, []);
-
-  const canSubmit = useMemo(() => {
-    return name.length > 0 && name.length < 40 && !creating;
-  }, [name, creating]);
-
   const onSubmit = useCallback(
     async (
-      e: React.FormEvent<HTMLFormElement>,
+      data: z.infer<typeof teamFormSchema>,
       closeDialog: CloseDialogCallback,
     ) => {
-      e.preventDefault();
-
-      if (!canSubmit) {
+      console.log('data', data);
+      if (creating) {
         return;
       }
-
+      console.log('MASTER_CONTRACT_CONFIG', MASTER_CONTRACT_CONFIG);
       try {
         setCreating(true);
-
         await writeContractAsync({
           ...MASTER_CONTRACT_CONFIG,
           functionName: 'createTeam',
           args: [
-            BigInt(id),
+            BigInt(eventId),
             {
-              name,
+              name: data.name,
               leader: wallet!.address,
               members: [],
             },
           ],
         });
-
+        console.log('Team created');
         closeDialog();
       } catch (err: any) {
         console.error(err);
@@ -67,38 +51,21 @@ const Form: FC<{
         setCreating(false);
       }
     },
-    [canSubmit, id, name, wallet, writeContractAsync],
+    [creating, eventId, writeContractAsync, wallet],
   );
 
-  return (
-    <form className="flex flex-col" onSubmit={(e) => onSubmit(e, closeDialog)}>
-      <input
-        className="mb-4 text-black"
-        type="text"
-        placeholder="Event name"
-        onChange={onNameChange}
-        value={name}
-        max={40}
-        size={30}
-      />
-      <p className="my-4">Team leader: {wallet?.address}</p>
-      <Button className="mb-2" type="submit" disabled={!canSubmit}>
-        Create team
-      </Button>
-      {error ? <ErrorBox>{error}</ErrorBox> : null}
-    </form>
-  );
-};
-
-export const CreateTeamDialog: FC<PropsWithChildren<{ eventId: number }>> = ({
-  eventId,
-  children,
-}) => {
   return (
     <ActionDialog
-      renderContent={(closeDialog) => (
+      dialogTitle={dialogTitle}
+      dialogDescription="Enter the details of your team for the event."
+      renderContent={(closeDialog: any) => (
         <LoadEventInfo eventId={eventId}>
-          {(ev) => <Form id={eventId} info={ev} closeDialog={closeDialog} />}
+          {(ev) => (
+            <>
+              <TeamForm onSubmit={(data) => onSubmit(data, closeDialog)} />
+              {error ? <ErrorBox>{error}</ErrorBox> : null}
+            </>
+          )}
         </LoadEventInfo>
       )}
     >
@@ -106,3 +73,9 @@ export const CreateTeamDialog: FC<PropsWithChildren<{ eventId: number }>> = ({
     </ActionDialog>
   );
 };
+
+const dialogTitle = (
+  <div className="text-2xl">
+    <span className="text-[hsl(280,100%,70%)]">Create</span> your Team
+  </div>
+);

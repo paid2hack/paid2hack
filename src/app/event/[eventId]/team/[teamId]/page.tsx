@@ -11,7 +11,10 @@ import { LoadEventInfo } from '~/app/Components/UI/LoadEventInfo';
 import { LoadTeamInfo } from '~/app/Components/UI/LoadTeamInfo';
 import { Loading } from '~/app/Components/UI/Loading';
 import { EventInfo } from '~/app/hooks/event';
-import { useSponsor, useSponsorClaimablePrizeByWallet } from '~/app/hooks/sponsor';
+import {
+  useSponsor,
+  useSponsorClaimablePrizeByWallet,
+} from '~/app/hooks/sponsor';
 import { TeamInfo } from '~/app/hooks/team';
 import { useWallet } from '~/app/hooks/wallet';
 import { isEthereumAddress, isSameEthereumAddress } from '~/app/lib/utils';
@@ -44,7 +47,11 @@ const ClaimPrize = (params: Params & { sponsorAddress: string }) => {
         ...SPONSOR_CONTRACT_CONFIG,
         address: sponsorAddress as `0x${string}`,
         functionName: 'claimPrize',
-        args: [BigInt(teamId), env.NEXT_PUBLIC_PAYMENT_TOKEN_CONTRACT as `0x${string}`, wallet!.address as `0x${string}`],
+        args: [
+          BigInt(teamId),
+          env.NEXT_PUBLIC_PAYMENT_TOKEN_CONTRACT as `0x${string}`,
+          wallet!.address as `0x${string}`,
+        ],
       });
     } catch (err: any) {
       console.error(err);
@@ -55,56 +62,80 @@ const ClaimPrize = (params: Params & { sponsorAddress: string }) => {
   }, [writeContractAsync, sponsorAddress, teamId, wallet]);
 
   return (
-    <div>
-      <Button onClick={claim} disabled={updating}>
+    <div className="mt-4">
+      <Button
+        onClick={claim}
+        disabled={updating}
+        className="rounded-md bg-[#4c8bf5] px-4 py-2 text-white hover:bg-[#3c74d6] disabled:bg-gray-500"
+      >
         Claim prize
       </Button>
       {updating && <Loading />}
-      {error && <ErrorBox>{`${error}`}</ErrorBox>}
+      {error && (
+        <ErrorBox className="mt-2 rounded-md bg-red-500 p-2 text-white">{`${error}`}</ErrorBox>
+      )}
     </div>
   );
-}
+};
 
 const SponsorPrize = (params: Params & { sponsorAddress: string }) => {
   const wallet = useWallet();
-  const { eventId, teamId, sponsorAddress } = params
+  const { eventId, teamId, sponsorAddress } = params;
 
-  const sponsor = useSponsor(sponsorAddress)
-  const sponsorPrize = useSponsorClaimablePrizeByWallet(sponsorAddress, teamId, wallet?.address || zeroAddress)
+  const sponsor = useSponsor(sponsorAddress);
+  const sponsorPrize = useSponsorClaimablePrizeByWallet(
+    sponsorAddress,
+    teamId,
+    wallet?.address || zeroAddress,
+  );
 
-  const isLoading = useMemo(() => sponsor.isLoading || sponsorPrize.isLoading, [
-    sponsor.isLoading,
-    sponsorPrize.isLoading,
-  ]);
+  const isLoading = useMemo(
+    () => sponsor.isLoading || sponsorPrize.isLoading,
+    [sponsor.isLoading, sponsorPrize.isLoading],
+  );
 
-  const error = useMemo(() => sponsor.error || sponsorPrize.error, [
-    sponsor.error,
-    sponsorPrize.error,
-  ]);
+  const error = useMemo(
+    () => sponsor.error || sponsorPrize.error,
+    [sponsor.error, sponsorPrize.error],
+  );
 
-  const prize = useMemo(() => (sponsorPrize.data) ? sponsorPrize.data : null, [sponsorPrize.data])
+  const prize = useMemo(
+    () => (sponsorPrize.data ? sponsorPrize.data : null),
+    [sponsorPrize.data],
+  );
 
   return (
-    <>
+    <div className="mb-4 rounded-md bg-[#2c2c2c] p-4">
       {isLoading && <Loading />}
-      {error && <ErrorBox>{`${error}`}</ErrorBox>}
-      {(sponsor.parsedData) && (
-        <div className="rounded-md p-4 mb-4 border border-white">
-          <div className="mb-4">
-            {sponsor.parsedData.name} - <Link href={`/event/${eventId}/sponsor/${sponsorAddress}`}>View</Link>
+      {error && (
+        <ErrorBox className="mt-2 rounded-md bg-red-500 p-2 text-white">{`${error}`}</ErrorBox>
+      )}
+      {sponsor.parsedData && (
+        <>
+          <div className="mb-4 flex items-center justify-between">
+            <h3 className="text-xl font-bold">{sponsor.parsedData.name}</h3>
+            <Link
+              href={`/event/${eventId}/sponsor/${sponsorAddress}`}
+              className="text-[#4c8bf5] hover:text-[#3c74d6]"
+            >
+              View
+            </Link>
           </div>
           {prize ? (
             <div>
-              <p className="bg-red text-white">You can claim: {`${formatEther(prize)}`} tokens!!</p>
+              <p className="mb-2 rounded-md bg-green-500 p-2 text-white">
+                You can claim: {`${formatEther(prize)}`} tokens!!
+              </p>
               <ClaimPrize {...params} sponsorAddress={sponsorAddress} />
             </div>
-          ) : <p>You have nothing to clam.</p>}
-        </div>
-        
+          ) : (
+            <p>You have nothing to claim.</p>
+          )}
+        </>
       )}
-    </>
+    </div>
   );
-}
+};
 
 const AddMemberForm = ({ teamId, teamInfo }: Params) => {
   const { writeContractAsync } = useWriteContract();
@@ -157,20 +188,30 @@ const AddMemberForm = ({ teamId, teamInfo }: Params) => {
   );
 
   return (
-    <form className="mt-2" onSubmit={onSubmit}>
-      <input
-        className="mb-4 text-black"
-        type="text"
-        placeholder="New team member"
-        onChange={onChangeMember}
-        value={member}
-        max={40}
-        size={40}
-      />
-      <Button className="mb-2" type="submit" disabled={!canSubmit}>
+    <form className="mt-4" onSubmit={onSubmit}>
+      <div className="mb-4">
+        <input
+          className="w-full rounded-md bg-[#2c2c2c] px-4 py-2 text-black"
+          type="text"
+          placeholder="New team member"
+          onChange={onChangeMember}
+          value={member}
+          max={40}
+          size={40}
+        />
+      </div>
+      <Button
+        className="mb-2 rounded-md bg-[#4c8bf5] px-4 py-2 text-white hover:bg-[#3c74d6] disabled:bg-gray-500"
+        type="submit"
+        disabled={!canSubmit}
+      >
         Add new member
       </Button>
-      {error ? <ErrorBox>{error}</ErrorBox> : null}
+      {error ? (
+        <ErrorBox className="mt-2 rounded-md bg-red-500 p-2 text-white">
+          {error}
+        </ErrorBox>
+      ) : null}
     </form>
   );
 };
@@ -209,17 +250,23 @@ const Member = ({
   }, [member, teamInfo.members, teamId, writeContractAsync]);
 
   return (
-    <div>
-      <div className="flex flex-row justify-between">
-        <p>{member}</p>
-        {isTeamLeader && (
-          <Button onClick={remove} disabled={updating}>
+    <div className="flex items-center justify-between py-2">
+      <p>{member}</p>
+      {isTeamLeader && (
+        <div className="flex items-center">
+          <Button
+            onClick={remove}
+            disabled={updating}
+            className="rounded-md bg-red-500 px-4 py-2 text-white hover:bg-red-600 disabled:bg-gray-500"
+          >
             Remove
           </Button>
-        )}
-      </div>
-      {updating && <Loading />}
-      {error && <ErrorBox>{`${error}`}</ErrorBox>}
+          {updating && <Loading className="ml-2" />}
+        </div>
+      )}
+      {error && (
+        <ErrorBox className="mt-2 rounded-md bg-red-500 p-2 text-white">{`${error}`}</ErrorBox>
+      )}
     </div>
   );
 };
@@ -237,26 +284,41 @@ const TeamInfoInner = (params: Params) => {
 
   return (
     <div>
-      <h1>Team: {teamInfo.name}</h1>
-      <p>Leader: {teamInfo.leader}</p>
-      {isTeamLeader && (
-        <UpdateTeamNameDialog teamId={teamId}>
-          <Button className="mb-2">Update team name</Button>
-        </UpdateTeamNameDialog>
-      )}
-      <h2>Members:</h2>
-      <ul>
-        {teamInfo.members.map((member, i) => (
-          <li key={i} className="mb-2">
-            <Member member={member} {...params} />
-          </li>
-        ))}
-      </ul>
-      {isTeamLeader && <AddMemberForm {...params} />}
-      <h2>Prizes to claim:</h2>
-      {event.sponsors.map((sponsorAddress, i) => (
-        <SponsorPrize key={i} {...params} sponsorAddress={sponsorAddress} />
-      ))}
+      <div className="bg- mb-8 flex max-w-56 flex-col justify-between gap-6">
+        <h1 className="text-3xl font-bold">Team: {teamInfo.name}</h1>
+        {isTeamLeader && (
+          <UpdateTeamNameDialog teamId={teamId}>
+            <Button className="rounded-md bg-[#4c8bf5] px-4 py-2 text-white hover:bg-[#3c74d6]">
+              Update team name
+            </Button>
+          </UpdateTeamNameDialog>
+        )}
+      </div>
+      <div className="mb-8">
+        <h2 className="mb-2 text-xl font-bold">Team Leader</h2>
+        <p>{teamInfo.leader}</p>
+      </div>
+      <div className="mb-8">
+        <h2 className="mb-2 text-xl font-bold">Members</h2>
+        <ul className="space-y-2">
+          {teamInfo.members.map((member, i) => (
+            <li key={i}>
+              <Member member={member} {...params} />
+            </li>
+          ))}
+        </ul>
+        {isTeamLeader && <AddMemberForm {...params} />}
+      </div>
+      <div>
+        <h2 className="mb-2 text-xl font-bold">Prizes to Claim</h2>
+        {event.sponsors.length > 0 ? (
+          event.sponsors.map((sponsorAddress, i) => (
+            <SponsorPrize key={i} {...params} sponsorAddress={sponsorAddress} />
+          ))
+        ) : (
+          <p>No prizes available to claim.</p>
+        )}
+      </div>
     </div>
   );
 };
@@ -270,26 +332,33 @@ export default function TeamPage({
   const teamId = Number(params.teamId);
 
   return (
-    <LoadEventInfo eventId={eventId}>
-      {(ev) => (
-        <div>
-          <Link href={`/event/${eventId}`}>
-            <p className="text-sm italic">Event: {ev.name}</p>
-          </Link>
-          <LoadTeamInfo teamId={teamId}>
-            {(team, isTeamLeader, isTeamMember) => (
-              <TeamInfoInner
-                eventId={eventId}
-                event={ev}
-                teamId={teamId}
-                teamInfo={team}
-                isTeamLeader={isTeamLeader}
-                isTeamMember={isTeamMember}
-              />
-            )}
-          </LoadTeamInfo>
-        </div>
-      )}
-    </LoadEventInfo>
+    <div className="mx-auto min-h-screen  bg-[#1a1a1a] text-[#f0f0f0]">
+      <div className="container mx-auto max-w-screen-lg px-4 py-8">
+        <LoadEventInfo eventId={eventId}>
+          {(ev) => (
+            <>
+              <Link
+                href={`/event/${eventId}`}
+                className="mb-8 block text-sm italic text-[#4c8bf5] hover:text-[#3c74d6]"
+              >
+                &larr; Back to Event: {ev.name}
+              </Link>
+              <LoadTeamInfo teamId={teamId}>
+                {(team, isTeamLeader, isTeamMember) => (
+                  <TeamInfoInner
+                    eventId={eventId}
+                    event={ev}
+                    teamId={teamId}
+                    teamInfo={team}
+                    isTeamLeader={isTeamLeader}
+                    isTeamMember={isTeamMember}
+                  />
+                )}
+              </LoadTeamInfo>
+            </>
+          )}
+        </LoadEventInfo>
+      </div>
+    </div>
   );
 }
