@@ -46,7 +46,6 @@ const providers = [
     },
     async authorize(credentials) {
       try {
-        console.log(credentials, new URL(env.NEXTAUTH_URL));
         const siwe = new SiweMessage(JSON.parse(credentials?.message || "{}"));
         const nextAuthUrl = new URL(env.NEXTAUTH_URL);
 
@@ -77,13 +76,6 @@ const providers = [
 export const authOptions: NextAuthOptions = {
   session: {
     strategy: "jwt",
-  },
-  debug: true,
-  logger: {
-    error: console.error,
-    warn: console.warn,
-    info: console.info,
-    debug: console.debug,
   },
   secret: process.env.NEXTAUTH_SECRET,
   callbacks: {
