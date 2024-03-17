@@ -53,7 +53,7 @@ const queryClient = new QueryClient();
 export const WagmiLayout: FC<PropsWithChildren<{}>> = ({ children }) => {
   return (
     <WagmiProvider config={config}>
-      <SessionProvider refetchInterval={0}>
+      <SessionProvider refetchInterval={0} basePath="/api/auth">
         <QueryClientProvider client={queryClient}>
           <RainbowKitSiweNextAuthProvider
             getSiweMessageOptions={getSiweMessageOptions}

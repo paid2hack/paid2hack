@@ -46,7 +46,6 @@ const providers = [
     },
     async authorize(credentials) {
       try {
-        console.log(credentials, new URL(env.NEXTAUTH_URL).host);
         const siwe = new SiweMessage(JSON.parse(credentials?.message || "{}"));
         const nextAuthUrl = new URL(env.NEXTAUTH_URL);
 
