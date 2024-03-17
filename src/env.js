@@ -44,7 +44,7 @@ export const env = createEnv({
     NEXT_PUBLIC_PAYMENT_TOKEN_CONTRACT: z
       .string()
       .refine(isEthereumAddress, "Must be a valid Ethereum address"),
-    NEXT_PUBLIC_CHAIN: z.enum(["localhost"]),
+    NEXT_PUBLIC_CHAIN: z.enum(["localhost", "arbitrumSepolia"]),
     NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID: z.string(),
     NEXT_PUBLIC_CHAIN_RPC_ENDPOINT: z.string().url(),
   },
